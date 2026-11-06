@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -7,10 +6,10 @@ import {
   Mail,
   Phone,
   MapPin,
-  Handshake,
-  Building2,
-  MessageCircle,
   Send,
+  MessageCircle,
+  Building2,
+  Sparkles,
 } from "lucide-react";
 
 const contactItems = [
@@ -30,7 +29,6 @@ const contactItems = [
     icon: MapPin,
     label: "LOCATION",
     value: "India",
-    href: null,
   },
 ];
 
@@ -43,12 +41,14 @@ const enquiryTypes = [
   "Other",
 ];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 35 },
+const ease = [0.22, 1, 0.36, 1];
+
+const reveal = {
+  hidden: { opacity: 0, y: 28 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.7, ease },
   },
 };
 
@@ -79,194 +79,274 @@ export default function Contact() {
     <main className="gg-contact">
 
       {/* HERO */}
-      <section className="gg-contact-hero">
-        <div className="contact-hero-orb" />
+      <section className="contact-hero">
+        <div className="contact-hero-glow" />
+
+        <div className="contact-hero-pattern">
+          <div className="contact-pattern-circle circle-one" />
+          <div className="contact-pattern-circle circle-two" />
+          <div className="contact-pattern-line" />
+        </div>
+
+        <div className="contact-hero-layout">
+          <motion.div
+            className="contact-hero-content"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: {
+                transition: { staggerChildren: 0.13 },
+              },
+            }}
+          >
+            <motion.div className="contact-eyebrow" variants={reveal}>
+              <span />
+              GHUGE GROUP / CONTACT
+            </motion.div>
+
+            <motion.h1 variants={reveal}>
+              Let's start a
+              <br />
+              <em>conversation.</em>
+            </motion.h1>
+
+            <motion.p variants={reveal}>
+              Every meaningful opportunity begins with a conversation.
+              Whether it's a business enquiry, partnership or a new idea,
+              we're ready to listen.
+            </motion.p>
+
+            <motion.a
+              href="#contact-main"
+              className="contact-hero-link"
+              variants={reveal}
+            >
+              Get in touch
+              <ArrowDown size={16} />
+            </motion.a>
+          </motion.div>
+
+          {/* CONTACT INFORMATION PANEL */}
+          <motion.div
+            className="contact-hero-side"
+            initial={{ opacity: 0, x: 35 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.9, delay: 0.35, ease }}
+          >
+            <div className="contact-hero-side-top">
+              <span>WE'RE HERE TO CONNECT</span>
+              <ArrowUpRight size={18} />
+            </div>
+
+            <div className="contact-hero-side-main">
+              <div className="contact-side-symbol">
+                <Building2 size={25} strokeWidth={1.3} />
+              </div>
+
+              <h3>
+                One group.
+                <br />
+                <em>Many possibilities.</em>
+              </h3>
+
+              <p>
+                Connect with GHUGE GROUP for enquiries,
+                partnerships and business opportunities.
+              </p>
+            </div>
+
+            <div className="contact-hero-side-links">
+              <a href="mailto:ghugegroup@gmail.com">
+                <Mail size={16} />
+                <span>ghugegroup@gmail.com</span>
+                <ArrowUpRight size={15} />
+              </a>
+
+              <a href="tel:8408820707">
+                <Phone size={16} />
+                <span>8408820707</span>
+                <ArrowUpRight size={15} />
+              </a>
+            </div>
+
+            <div className="contact-hero-side-footer">
+              <span>INDIA</span>
+              <span>BUILDING WITH PURPOSE</span>
+            </div>
+          </motion.div>
+        </div>
 
         <motion.div
-          className="contact-hero-inner"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.15 } },
-          }}
-        >
-          <motion.span className="contact-eyebrow" variants={fadeUp}>
-            <span className="contact-eyebrow-line" />
-            LET'S CONNECT
-          </motion.span>
-
-          <motion.h1 variants={fadeUp}>
-            Every great journey
-            <br />
-            begins with a <em>conversation.</em>
-          </motion.h1>
-
-          <motion.p variants={fadeUp}>
-            Have an idea, an opportunity or simply want to know
-            more about GHUGE GROUP? We'd be glad to hear from you.
-          </motion.p>
-
-          <motion.a href="#contact-details" variants={fadeUp}>
-            Start a conversation
-            <ArrowDown size={16} />
-          </motion.a>
-        </motion.div>
-
-        <motion.div
-          className="contact-hero-letter"
-          initial={{ opacity: 0, rotate: -15, scale: 0.8 }}
-          animate={{ opacity: 0.07, rotate: 0, scale: 1 }}
-          transition={{ duration: 1.4 }}
+          className="contact-hero-watermark"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 0.045, scale: 1 }}
+          transition={{ duration: 1.3 }}
         >
           G
         </motion.div>
 
-        <div className="contact-hero-index">
+        <div className="contact-hero-bottom">
           <span>GHUGE GROUP</span>
-          <span>OPEN TO POSSIBILITIES</span>
+          <span>
+            OPEN TO POSSIBILITIES <ArrowUpRight size={12} />
+          </span>
         </div>
       </section>
 
-      {/* CONTACT DETAILS */}
-      <section className="contact-details" id="contact-details">
+      {/* MAIN CONTACT AREA */}
+      <section className="contact-main" id="contact-main">
+
+        {/* LEFT SIDE */}
         <motion.div
-          className="contact-details-heading"
+          className="contact-intro"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
+          viewport={{ once: true, amount: 0.2 }}
+          variants={reveal}
         >
-          <span>01 / GET IN TOUCH</span>
+          <span className="contact-section-label">
+            01 / CONNECT WITH US
+          </span>
+
           <h2>
-            Let's make
+            Every connection
             <br />
-            <em>something happen.</em>
+            begins <em>somewhere.</em>
           </h2>
+
           <p>
-            Whether you're exploring a business opportunity,
-            considering a partnership or have a question,
-            our door is open.
+            From business enquiries to partnerships and new ideas,
+            we're always open to meaningful conversations.
           </p>
+
+          <div className="contact-direct-note">
+            <div className="contact-note-icon">
+              <MessageCircle size={20} />
+            </div>
+
+            <div>
+              <strong>Let's talk possibilities.</strong>
+              <span>
+                Reach out and tell us what you have in mind.
+              </span>
+            </div>
+          </div>
+
+          <div className="contact-info-list">
+            {contactItems.map((item, index) => {
+              const Icon = item.icon;
+
+              return (
+                <motion.div
+                  className="contact-info-item"
+                  key={item.label}
+                  initial={{ opacity: 0, x: -18 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    delay: index * 0.12,
+                    duration: 0.6,
+                  }}
+                >
+                  <div className="contact-info-icon">
+                    <Icon size={19} strokeWidth={1.6} />
+                  </div>
+
+                  <div className="contact-info-copy">
+                    <span>{item.label}</span>
+
+                    {item.href ? (
+                      <a href={item.href}>{item.value}</a>
+                    ) : (
+                      <strong>{item.value}</strong>
+                    )}
+                  </div>
+
+                  {item.href && (
+                    <a
+                      href={item.href}
+                      className="contact-info-arrow"
+                      aria-label={`Open ${item.label}`}
+                    >
+                      <ArrowUpRight size={17} />
+                    </a>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
         </motion.div>
 
-        <div className="contact-info-list">
-          {contactItems.map((item, index) => {
-            const Icon = item.icon;
+        {/* ENQUIRY FORM */}
+        <motion.div
+          className="contact-form-wrap"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.8, ease }}
+        >
+          <div className="contact-form-top">
+            <div>
+              <span className="contact-section-label">
+                02 / SEND AN ENQUIRY
+              </span>
 
-            return (
-              <motion.div
-                className="contact-info-item"
-                key={item.label}
-                initial={{ opacity: 0, x: 25 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.13, duration: 0.65 }}
-              >
-                <div className="contact-info-icon">
-                  <Icon size={21} strokeWidth={1.5} />
-                </div>
-
-                <div className="contact-info-text">
-                  <span>{item.label}</span>
-                  {item.href ? (
-                    <a href={item.href}>{item.value}</a>
-                  ) : (
-                    <strong>{item.value}</strong>
-                  )}
-                </div>
-
-                {item.href && (
-                  <a
-                    href={item.href}
-                    className="contact-info-arrow"
-                    aria-label={`Contact via ${item.label}`}
-                  >
-                    <ArrowUpRight size={19} />
-                  </a>
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ENQUIRY FORM */}
-      <section className="contact-enquiry">
-        <div className="contact-enquiry-layout">
-
-          <motion.div
-            className="contact-enquiry-left"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-          >
-            <span>02 / YOUR MESSAGE</span>
-
-            <h2>
-              Tell us
-              <br />
-              what's <em>on your mind.</em>
-            </h2>
-
-            <p>
-              Every meaningful connection starts somewhere.
-              Share your thoughts with us and let's explore
-              what we can create together.
-            </p>
-
-            <div className="contact-enquiry-decoration">
-              <MessageCircle size={27} strokeWidth={1.2} />
-              <span>We look forward to hearing from you.</span>
+              <h3>Tell us about it.</h3>
             </div>
-          </motion.div>
 
-          <motion.form
-            className="contact-form"
-            onSubmit={handleSubmit}
-            initial={{ opacity: 0, y: 35 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="contact-form-heading">
-              <span>GET IN TOUCH</span>
-              <h3>Send us a message.</h3>
+            <div className="contact-form-mark">
+              <Sparkles size={22} />
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            <div className="contact-form-row">
+              <label>
+                Your Name
+
+                <input
+                  type="text"
+                  placeholder="Full name"
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      name: e.target.value,
+                    })
+                  }
+                  required
+                />
+              </label>
+
+              <label>
+                Email Address
+
+                <input
+                  type="email"
+                  placeholder="Email address"
+                  value={form.email}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      email: e.target.value,
+                    })
+                  }
+                  required
+                />
+              </label>
             </div>
 
             <label>
-              Full Name
-              <input
-                type="text"
-                placeholder="Your name"
-                value={form.name}
-                onChange={(e) =>
-                  setForm({ ...form, name: e.target.value })
-                }
-                required
-              />
-            </label>
+              Enquiry Type
 
-            <label>
-              Email Address
-              <input
-                type="email"
-                placeholder="Your email address"
-                value={form.email}
-                onChange={(e) =>
-                  setForm({ ...form, email: e.target.value })
-                }
-                required
-              />
-            </label>
-
-            <label>
-              Subject
               <select
                 value={form.subject}
                 onChange={(e) =>
-                  setForm({ ...form, subject: e.target.value })
+                  setForm({
+                    ...form,
+                    subject: e.target.value,
+                  })
                 }
               >
                 {enquiryTypes.map((type) => (
@@ -279,84 +359,62 @@ export default function Contact() {
 
             <label>
               Your Message
+
               <textarea
                 rows="5"
-                placeholder="Tell us a little about your enquiry..."
+                placeholder="Share your thoughts, questions or ideas..."
                 value={form.message}
                 onChange={(e) =>
-                  setForm({ ...form, message: e.target.value })
+                  setForm({
+                    ...form,
+                    message: e.target.value,
+                  })
                 }
                 required
               />
             </label>
 
             <button type="submit" className="contact-submit">
-              Send Message
-              <Send size={16} />
+              Send Enquiry
+
+              <span>
+                <ArrowUpRight size={18} />
+              </span>
             </button>
 
             <small>
-              Your email application will open with your message
-              prepared. Review it and press Send to contact us.
+              Your default email application will open with your
+              enquiry prepared. Review and send it to reach us.
             </small>
-          </motion.form>
-        </div>
-      </section>
-
-      {/* BUSINESS ENQUIRIES */}
-      <section className="contact-business">
-        <motion.div
-          className="contact-business-inner"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
-        >
-          <div className="contact-business-icon">
-            <Handshake size={30} strokeWidth={1.3} />
-          </div>
-
-          <span>03 / BEYOND A CONVERSATION</span>
-
-          <h2>
-            Good connections
-            <br />
-            create <em>new possibilities.</em>
-          </h2>
-
-          <p>
-            We welcome conversations around business opportunities,
-            strategic partnerships, collaborations and ideas that
-            align with the vision of GHUGE GROUP.
-          </p>
-
-          <a href="mailto:ghugegroup@gmail.com?subject=Business%20Enquiry">
-            Discuss an Opportunity
-            <ArrowUpRight size={17} />
-          </a>
+          </form>
         </motion.div>
       </section>
 
-      {/* CLOSING */}
-      <section className="contact-closing">
+      {/* BOTTOM STRIP */}
+      <section className="contact-bottom">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          className="contact-bottom-inner"
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          variants={reveal}
         >
-          <Building2 size={25} strokeWidth={1.2} />
-          <span>GHUGE GROUP / LOOKING AHEAD</span>
+          <div className="contact-bottom-icon">
+            <Building2 size={23} strokeWidth={1.4} />
+          </div>
 
-          <h2>
-            Let's build
-            <br />
-            <em>something meaningful.</em>
-          </h2>
+          <div className="contact-bottom-copy">
+            <span>GHUGE GROUP</span>
+
+            <h2>
+              Built on connections.
+              <em> Driven by possibilities.</em>
+            </h2>
+          </div>
 
           <a href="mailto:ghugegroup@gmail.com">
-            Start a Conversation
-            <ArrowUpRight size={18} />
+            Email Us
+            <ArrowUpRight size={17} />
           </a>
         </motion.div>
       </section>
@@ -370,19 +428,18 @@ const styles = `
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
 
 .gg-contact {
-  --wine: #351820;
-  --wine-deep: #241419;
-  --wine-mid: #51232D;
-  --wine-soft: #713844;
-  --cream: #F4E8DA;
-  --cream-dark: #E9D8C9;
-  --gold: #C7A47B;
-  --gold-light: #E4C49C;
-  --ink: #291B1E;
-  --muted: #897775;
-  font-family: 'DM Sans', sans-serif;
+  --orange: #E96A24;
+  --orange-dark: #C94B12;
+  --orange-mid: #F28A42;
+  --orange-light: #F8B078;
+  --cream: #FFF9F3;
+  --peach: #FCE6D5;
+  --muted: #98684E;
+  --ink: #783311;
+
   background: var(--cream);
   color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
   overflow: hidden;
 }
 
@@ -397,19 +454,32 @@ const styles = `
 
 /* HERO */
 
-.gg-contact-hero {
-  min-height: 650px;
-  background: var(--wine-deep);
-  color: var(--cream);
+.contact-hero {
+  min-height: 610px;
+  padding: 100px 10% 85px;
   display: flex;
   align-items: center;
-  padding: 110px 11%;
   position: relative;
   overflow: hidden;
+  isolation: isolate;
+  background: var(--orange);
+  color: var(--cream);
 }
 
-.contact-hero-inner {
-  max-width: 850px;
+.contact-hero-layout {
+  width: 100%;
+  max-width: 1250px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1.15fr .75fr;
+  align-items: center;
+  gap: 75px;
+  position: relative;
+  z-index: 3;
+}
+
+.contact-hero-content {
+  max-width: 700px;
   position: relative;
   z-index: 2;
 }
@@ -417,513 +487,681 @@ const styles = `
 .contact-eyebrow {
   display: flex;
   align-items: center;
-  gap: 13px;
-  color: var(--gold);
+  gap: 12px;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 3px;
+  letter-spacing: 2.8px;
 }
 
-.contact-eyebrow-line {
-  width: 35px;
+.contact-eyebrow span {
+  width: 31px;
   height: 1px;
-  background: var(--gold);
+  background: var(--cream);
 }
 
-.contact-hero-inner h1 {
+.contact-hero h1 {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(48px, 6.7vw, 83px);
-  line-height: 1.13;
+  font-size: clamp(54px, 6.2vw, 79px);
+  line-height: 1.1;
   font-weight: 400;
-  letter-spacing: -2px;
-  margin: 35px 0 23px;
+  letter-spacing: -2.5px;
+  margin: 34px 0 22px;
 }
 
-.contact-hero-inner h1 em {
-  color: var(--gold-light);
+.contact-hero h1 em {
+  color: #FFF0E3;
   font-weight: 400;
 }
 
-.contact-hero-inner > p {
-  color: #CDBBB4;
-  max-width: 510px;
+.contact-hero-content > p {
+  max-width: 430px;
+  color: #FFF0E3;
   font-size: 14px;
   line-height: 1.9;
 }
 
-.contact-hero-inner > a {
+.contact-hero-link {
   display: inline-flex;
   align-items: center;
-  gap: 15px;
-  margin-top: 35px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--gold);
-  color: var(--gold-light);
+  gap: 13px;
+  margin-top: 28px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid rgba(255,249,243,.7);
   font-size: 12px;
-  transition: .3s ease;
+  font-weight: 600;
+  transition: gap .3s ease;
 }
 
-.contact-hero-inner > a:hover {
-  gap: 23px;
+.contact-hero-link:hover {
+  gap: 21px;
 }
 
-.contact-hero-orb {
-  position: absolute;
-  right: -100px;
-  top: -180px;
-  width: 620px;
-  height: 620px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(199,164,123,.16), transparent 68%);
-  animation: contactOrb 9s ease-in-out infinite alternate;
+/* RIGHT CONTACT PANEL */
+
+.contact-hero-side {
+  position: relative;
+  z-index: 3;
+  padding: 28px;
+  background: rgba(255,249,243,.11);
+  border: 1px solid rgba(255,249,243,.27);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-@keyframes contactOrb {
-  from { transform: scale(.9); opacity: .5; }
-  to { transform: scale(1.2); opacity: 1; }
+.contact-hero-side-top,
+.contact-hero-side-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(255,249,243,.8);
+  font-size: 9px;
+  letter-spacing: 1.7px;
 }
 
-.contact-hero-letter {
-  position: absolute;
-  right: 10%;
-  top: 50%;
-  transform: translateY(-50%);
+.contact-hero-side-main {
+  padding: 42px 0 35px;
+}
+
+.contact-side-symbol {
+  width: 49px;
+  height: 49px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,249,243,.4);
+  margin-bottom: 23px;
+}
+
+.contact-hero-side-main h3 {
   font-family: 'Playfair Display', serif;
-  font-size: 470px;
+  font-size: 35px;
+  line-height: 1.2;
+  font-weight: 400;
+  margin: 0 0 15px;
+}
+
+.contact-hero-side-main h3 em {
+  color: #FFF0E3;
+  font-weight: 400;
+}
+
+.contact-hero-side-main p {
+  color: rgba(255,249,243,.83);
+  font-size: 12px;
+  line-height: 1.8;
+  max-width: 310px;
+}
+
+.contact-hero-side-links {
+  border-top: 1px solid rgba(255,249,243,.25);
+}
+
+.contact-hero-side-links a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(255,249,243,.2);
+  font-size: 11px;
+  transition: opacity .3s ease;
+}
+
+.contact-hero-side-links a:hover {
+  opacity: .7;
+}
+
+.contact-hero-side-links a span {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+
+.contact-hero-side-footer {
+  padding-top: 20px;
+  font-size: 8px;
+}
+
+.contact-hero-glow {
+  position: absolute;
+  z-index: -1;
+  width: 650px;
+  height: 650px;
+  right: -170px;
+  top: -220px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255,224,196,.35),
+    transparent 68%
+  );
+}
+
+.contact-hero-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.contact-pattern-circle {
+  position: absolute;
+  border: 1px solid rgba(255,249,243,.15);
+  border-radius: 50%;
+}
+
+.circle-one {
+  width: 490px;
+  height: 490px;
+  right: 5%;
+  top: 5%;
+}
+
+.circle-two {
+  width: 340px;
+  height: 340px;
+  right: 12%;
+  top: 19%;
+}
+
+.contact-pattern-line {
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  right: 29%;
+  top: 0;
+  background: rgba(255,249,243,.1);
+}
+
+.contact-hero-watermark {
+  position: absolute;
+  z-index: 0;
+  right: 7%;
+  top: 35%;
+  font-family: 'Playfair Display', serif;
+  font-size: 390px;
   line-height: 1;
-  color: var(--gold);
+  color: var(--cream);
   pointer-events: none;
 }
 
-.contact-hero-index {
+.contact-hero-bottom {
   position: absolute;
-  bottom: 27px;
-  left: 11%;
-  right: 11%;
+  bottom: 24px;
+  left: 10%;
+  right: 10%;
   display: flex;
   justify-content: space-between;
-  color: #B7A09A;
+  align-items: center;
+  color: rgba(255,249,243,.8);
   font-size: 9px;
   letter-spacing: 2px;
 }
 
-/* CONTACT DETAILS */
-
-.contact-details {
-  padding: 115px 12%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 100px;
+.contact-hero-bottom span:last-child {
+  display: flex;
   align-items: center;
+  gap: 7px;
 }
 
-.contact-details-heading > span,
-.contact-enquiry-left > span,
-.contact-business-inner > span,
-.contact-closing > div > span {
-  color: var(--gold);
+/* MAIN CONTACT */
+
+.contact-main {
+  max-width: 1440px;
+  margin: auto;
+  padding: 105px 10%;
+  display: grid;
+  grid-template-columns: .85fr 1.15fr;
+  gap: 85px;
+  align-items: start;
+}
+
+.contact-section-label {
+  color: var(--orange);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 2.5px;
+  letter-spacing: 2.2px;
 }
 
-.contact-details-heading h2,
-.contact-enquiry-left h2 {
+.contact-intro h2 {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(39px, 4.5vw, 58px);
-  line-height: 1.2;
+  font-size: clamp(39px, 4.5vw, 57px);
   font-weight: 400;
-  margin: 27px 0 20px;
+  line-height: 1.18;
+  letter-spacing: -1px;
+  margin: 26px 0 19px;
 }
 
-.contact-details-heading h2 em,
-.contact-enquiry-left h2 em {
-  color: var(--wine-soft);
+.contact-intro h2 em {
+  color: var(--orange);
   font-weight: 400;
 }
 
-.contact-details-heading p,
-.contact-enquiry-left > p {
-  max-width: 420px;
+.contact-intro > p {
+  max-width: 410px;
   color: var(--muted);
   font-size: 13px;
   line-height: 1.9;
 }
 
+.contact-direct-note {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 32px 0 36px;
+  padding: 17px;
+  background: #FFF1E6;
+  border-left: 2px solid var(--orange);
+}
+
+.contact-note-icon {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--orange);
+  background: var(--cream);
+}
+
+.contact-direct-note div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.contact-direct-note strong {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.contact-direct-note span {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
 .contact-info-list {
-  border-top: 1px solid rgba(53,24,32,.17);
+  border-top: 1px solid rgba(120,51,17,.15);
 }
 
 .contact-info-item {
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 25px 5px;
-  border-bottom: 1px solid rgba(53,24,32,.17);
+  gap: 15px;
+  padding: 18px 3px;
+  border-bottom: 1px solid rgba(120,51,17,.15);
 }
 
 .contact-info-icon {
-  width: 45px;
-  height: 45px;
+  width: 42px;
+  height: 42px;
   display: grid;
   place-items: center;
-  color: var(--wine-soft);
-  border: 1px solid rgba(81,35,45,.2);
+  flex-shrink: 0;
+  color: var(--orange);
+  border: 1px solid rgba(233,106,36,.25);
 }
 
-.contact-info-text {
-  flex: 1;
+.contact-info-copy {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
+  flex: 1;
   min-width: 0;
 }
 
-.contact-info-text span {
+.contact-info-copy span {
   color: var(--muted);
   font-size: 9px;
-  letter-spacing: 2px;
+  letter-spacing: 1.8px;
 }
 
-.contact-info-text a,
-.contact-info-text strong {
-  color: var(--wine);
+.contact-info-copy a,
+.contact-info-copy strong {
   font-size: 13px;
   font-weight: 600;
   overflow-wrap: anywhere;
 }
 
-.contact-info-text a:hover {
-  color: var(--wine-soft);
+.contact-info-copy a:hover {
+  color: var(--orange);
 }
 
 .contact-info-arrow {
-  color: var(--gold);
-  transition: .3s ease;
+  color: var(--orange);
+  transition: transform .3s ease;
 }
 
 .contact-info-arrow:hover {
   transform: translate(4px, -4px);
 }
 
-/* ENQUIRY */
+/* FORM */
 
-.contact-enquiry {
-  padding: 110px 10%;
-  background: #EADCCD;
+.contact-form-wrap {
+  padding: 37px;
+  background: #FFF4E9;
+  border: 1px solid rgba(233,106,36,.13);
+  box-shadow: 0 18px 55px rgba(120,51,17,.055);
 }
 
-.contact-enquiry-layout {
-  display: grid;
-  grid-template-columns: .9fr 1fr;
-  gap: 90px;
-  align-items: start;
-}
-
-.contact-enquiry-left {
-  padding-top: 35px;
-}
-
-.contact-enquiry-left > p {
-  max-width: 400px;
-}
-
-.contact-enquiry-decoration {
+.contact-form-top {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 15px;
-  margin-top: 55px;
-  color: var(--wine-soft);
-}
-
-.contact-enquiry-decoration span {
-  font-family: 'Playfair Display', serif;
-  font-size: 17px;
-  font-style: italic;
-}
-
-.contact-form {
-  padding: 40px;
-  background: var(--cream);
-  box-shadow: 0 20px 65px rgba(53,24,32,.07);
-}
-
-.contact-form-heading {
   margin-bottom: 30px;
 }
 
-.contact-form-heading span {
-  color: var(--gold);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 2px;
-}
-
-.contact-form-heading h3 {
+.contact-form-top h3 {
   font-family: 'Playfair Display', serif;
-  font-size: 30px;
+  font-size: 32px;
   font-weight: 400;
-  margin: 12px 0 0;
+  margin: 11px 0 0;
 }
 
-.contact-form label {
+.contact-form-mark {
+  width: 47px;
+  height: 47px;
+  display: grid;
+  place-items: center;
+  color: var(--orange);
+  border: 1px solid rgba(233,106,36,.25);
+  border-radius: 50%;
+}
+
+.contact-form-wrap form {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+}
+
+.contact-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 17px;
+}
+
+.contact-form-wrap label {
   display: block;
-  margin-bottom: 22px;
-  color: var(--wine);
+  color: var(--ink);
   font-size: 11px;
   font-weight: 700;
 }
 
-.contact-form input,
-.contact-form select,
-.contact-form textarea {
+.contact-form-wrap input,
+.contact-form-wrap select,
+.contact-form-wrap textarea {
   width: 100%;
   display: block;
-  margin-top: 10px;
+  margin-top: 9px;
   padding: 14px;
-  background: transparent;
-  border: 1px solid #DCCBC0;
+  border: 1px solid #EBD4C1;
+  border-radius: 0;
   outline: none;
+  background: var(--cream);
   color: var(--ink);
   font-family: 'DM Sans', sans-serif;
   font-size: 12px;
-  transition: border .25s ease;
+  transition: border .25s ease, box-shadow .25s ease;
 }
 
-.contact-form input:focus,
-.contact-form select:focus,
-.contact-form textarea:focus {
-  border-color: var(--gold);
+.contact-form-wrap input:focus,
+.contact-form-wrap select:focus,
+.contact-form-wrap textarea:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(233,106,36,.08);
 }
 
-.contact-form textarea {
+.contact-form-wrap textarea {
   resize: vertical;
+  min-height: 125px;
 }
 
-.contact-form input::placeholder,
-.contact-form textarea::placeholder {
-  color: #A99A92;
+.contact-form-wrap input::placeholder,
+.contact-form-wrap textarea::placeholder {
+  color: #B99A86;
 }
 
 .contact-submit {
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 13px;
-  padding: 16px;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 15px 18px;
   border: none;
-  background: var(--wine);
-  color: var(--cream);
+  background: var(--orange);
+  color: white;
   font-family: 'DM Sans', sans-serif;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition: .3s ease;
+  transition: background .3s ease, transform .3s ease;
+}
+
+.contact-submit span {
+  display: grid;
+  place-items: center;
+  transition: transform .3s ease;
 }
 
 .contact-submit:hover {
-  background: var(--wine-soft);
-  transform: translateY(-3px);
+  background: var(--orange-dark);
+  transform: translateY(-2px);
 }
 
-.contact-form > small {
+.contact-submit:hover span {
+  transform: translate(3px, -3px);
+}
+
+.contact-form-wrap small {
   display: block;
-  margin-top: 15px;
   color: var(--muted);
   font-size: 10px;
   line-height: 1.7;
 }
 
-/* BUSINESS ENQUIRIES */
+/* BOTTOM STRIP */
 
-.contact-business {
-  padding: 110px 10%;
-  background: var(--cream);
-  text-align: center;
+.contact-bottom {
+  padding: 35px 10%;
+  background: var(--peach);
 }
 
-.contact-business-inner {
-  max-width: 750px;
+.contact-bottom-inner {
+  max-width: 1200px;
   margin: auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
-.contact-business-icon {
-  width: 65px;
-  height: 65px;
-  margin: 0 auto 25px;
+.contact-bottom-icon {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
   display: grid;
   place-items: center;
-  color: var(--gold);
-  border: 1px solid rgba(199,164,123,.6);
+  color: var(--orange);
+  border: 1px solid rgba(233,106,36,.3);
 }
 
-.contact-business-inner h2 {
+.contact-bottom-copy {
+  flex: 1;
+}
+
+.contact-bottom-copy > span {
+  color: var(--orange);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.contact-bottom-copy h2 {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(40px, 5vw, 62px);
+  font-size: clamp(19px, 2.4vw, 27px);
   font-weight: 400;
-  line-height: 1.2;
-  margin: 27px 0 20px;
+  margin: 7px 0 0;
 }
 
-.contact-business-inner h2 em {
-  color: var(--wine-soft);
+.contact-bottom-copy h2 em {
+  color: var(--orange);
   font-weight: 400;
 }
 
-.contact-business-inner p {
-  max-width: 570px;
-  margin: 0 auto;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.9;
-}
-
-.contact-business-inner > a {
+.contact-bottom-inner > a {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
-  margin-top: 30px;
-  padding: 15px 22px;
-  background: var(--wine);
-  color: var(--cream);
+  gap: 12px;
+  padding: 14px 19px;
+  background: var(--orange);
+  color: white;
   font-size: 11px;
   font-weight: 700;
+  white-space: nowrap;
   transition: .3s ease;
 }
 
-.contact-business-inner > a:hover {
-  background: var(--wine-soft);
-  transform: translateY(-3px);
-}
-
-/* CLOSING */
-
-.contact-closing {
-  padding: 100px 8%;
-  background: var(--wine-deep);
-  color: var(--cream);
-  text-align: center;
-}
-
-.contact-closing > div {
-  max-width: 750px;
-  margin: auto;
-}
-
-.contact-closing > div > svg {
-  color: var(--gold);
-  margin-bottom: 20px;
-}
-
-.contact-closing h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(43px, 5.5vw, 69px);
-  line-height: 1.18;
-  font-weight: 400;
-  margin: 28px 0 35px;
-}
-
-.contact-closing h2 em {
-  color: var(--gold-light);
-  font-weight: 400;
-}
-
-.contact-closing a {
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 23px;
-  background: var(--gold);
-  color: var(--wine-deep);
-  font-size: 12px;
-  font-weight: 700;
-  transition: .3s ease;
-}
-
-.contact-closing a:hover {
-  background: var(--gold-light);
-  transform: translateY(-3px);
+.contact-bottom-inner > a:hover {
+  background: var(--orange-dark);
+  transform: translateY(-2px);
 }
 
 /* RESPONSIVE */
 
-@media (max-width: 850px) {
-  .gg-contact-hero {
-    padding: 100px 7%;
-    min-height: 600px;
-  }
-
-  .contact-hero-letter {
-    right: -5%;
-    font-size: 350px;
-  }
-
-  .contact-hero-index {
-    left: 7%;
-    right: 7%;
-  }
-
-  .contact-details {
-    padding: 90px 7%;
-    grid-template-columns: 1fr;
-    gap: 45px;
-  }
-
-  .contact-enquiry {
+@media (max-width: 950px) {
+  .contact-hero {
     padding: 90px 7%;
   }
 
-  .contact-enquiry-layout {
-    grid-template-columns: 1fr;
-    gap: 45px;
+  .contact-hero-layout {
+    grid-template-columns: 1fr .85fr;
+    gap: 35px;
   }
 
-  .contact-enquiry-left {
-    padding-top: 0;
+  .contact-hero h1 {
+    font-size: clamp(48px, 6vw, 65px);
+  }
+
+  .contact-hero-side {
+    padding: 23px;
+  }
+
+  .contact-hero-side-main h3 {
+    font-size: 29px;
+  }
+
+  .contact-main {
+    grid-template-columns: 1fr;
+    gap: 55px;
+    padding: 85px 8%;
+  }
+
+  .contact-intro {
+    max-width: 650px;
+  }
+
+  .contact-intro > p {
+    max-width: 520px;
+  }
+
+  .contact-info-list {
+    max-width: 650px;
   }
 }
 
-@media (max-width: 550px) {
-  .gg-contact-hero {
-    min-height: 590px;
+@media (max-width: 650px) {
+  .contact-hero {
+    min-height: auto;
+    padding: 85px 7% 75px;
   }
 
-  .contact-hero-inner h1 {
-    font-size: 47px;
+  .contact-hero-layout {
+    grid-template-columns: 1fr;
+    gap: 45px;
   }
 
-  .contact-hero-letter {
-    font-size: 250px;
+  .contact-hero h1 {
+    font-size: clamp(45px, 11vw, 59px);
+    letter-spacing: -1.5px;
+  }
+
+  .contact-hero-content > p {
+    font-size: 13px;
+  }
+
+  .contact-hero-side {
+    max-width: 100%;
+    padding: 23px;
+  }
+
+  .contact-hero-side-main {
+    padding: 30px 0 25px;
+  }
+
+  .contact-hero-watermark {
     right: -12%;
+    top: 12%;
+    font-size: 260px;
   }
 
-  .contact-hero-index {
+  .contact-pattern-circle.circle-one {
+    width: 300px;
+    height: 300px;
+    right: -20%;
+    top: 5%;
+  }
+
+  .contact-pattern-circle.circle-two {
+    width: 210px;
+    height: 210px;
+    right: -5%;
+    top: 12%;
+  }
+
+  .contact-hero-bottom {
+    left: 7%;
+    right: 7%;
+    bottom: 18px;
     font-size: 7px;
     letter-spacing: 1px;
   }
 
-  .contact-details,
-  .contact-enquiry,
-  .contact-business {
-    padding: 75px 7%;
+  .contact-main {
+    padding: 72px 7%;
+    gap: 42px;
   }
 
-  .contact-form {
-    padding: 26px 20px;
+  .contact-intro h2 {
+    font-size: 43px;
   }
 
-  .contact-info-item {
-    gap: 12px;
+  .contact-form-wrap {
+    padding: 25px 19px;
   }
 
-  .contact-info-text a,
-  .contact-info-text strong {
-    font-size: 12px;
+  .contact-form-top h3 {
+    font-size: 27px;
   }
 
-  .contact-closing {
-    padding: 80px 7%;
+  .contact-form-row {
+    grid-template-columns: 1fr;
+    gap: 19px;
+  }
+
+  .contact-bottom {
+    padding: 27px 7%;
+  }
+
+  .contact-bottom-inner {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .contact-bottom-copy {
+    min-width: calc(100% - 70px);
+  }
+
+  .contact-bottom-inner > a {
+    margin-left: 67px;
   }
 }
 
@@ -933,6 +1171,7 @@ const styles = `
   .gg-contact *::after {
     animation-duration: .01ms !important;
     transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 `;

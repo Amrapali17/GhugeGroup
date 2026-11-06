@@ -1,890 +1,2295 @@
-import React, { useRef } from "react";
+
+import React, { useEffect, useState } from "react";
 import {
   motion,
-  AnimatePresence,
   useScroll,
-  useTransform,
   useSpring,
-  useMotionValue,
-  useMotionValueEvent,
+  useInView,
+  useReducedMotion,
 } from "framer-motion";
-import { ArrowDown, ArrowUpRight, Menu, X } from "lucide-react";
 
-const ventures = [
-  { number: "01", name: "Laxmi Gas", category: "ENERGY & DISTRIBUTION", description: "An established gas business serving everyday energy requirements.", status: "OPERATING", symbol: "L", detail: "ENERGY" },
-  { number: "02", name: "UpLyftBusiness", category: "DIGITAL & TECHNOLOGY", description: "Digital experiences and technology solutions for businesses.", status: "OPERATING", symbol: "U", detail: "DIGITAL", href: "https://www.uplyftbusiness.com" },
-  { number: "03", name: "Sports Academy", category: "SPORTS & DEVELOPMENT", description: "A future initiative focused on sports and development.", status: "COMING SOON", symbol: "S", detail: "SPORTS" },
-];
+import {
+  ArrowUpRight,
+  ArrowRight,
+  Menu,
+  X,
+  Sparkles,
+  Globe2,
+  Layers3,
+  Building2,
+  Compass,
+  MoveUpRight,
+} from "lucide-react";
+
+/* ----------------------------------------
+   ANIMATION SETTINGS
+---------------------------------------- */
 
 const ease = [0.22, 1, 0.36, 1];
 
-/* ---------- helpers ---------- */
+const reveal = {
+  hidden: {
+    opacity: 0,
+    y: 35,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.8,
+      ease,
+    },
+  },
+};
 
 function Reveal({ children, delay = 0, className = "" }) {
+  const ref = React.useRef(null);
+
+  const isInView = useInView(ref, {
+    once: true,
+    amount: 0.15,
+  });
+
   return (
     <motion.div
+      ref={ref}
       className={className}
-      initial={{ opacity: 0, y: 30, filter: "blur(6px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 1, delay, ease }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-/* Text rises out of a clipping mask, one line at a time */
-function Mask({ children, delay = 0, now = false }) {
-  const trigger = now
-    ? { animate: { y: 0 } }
-    : { whileInView: { y: 0 }, viewport: { once: true, amount: 0.4 } };
-  return (
-    <span className="mask">
-      <motion.span
-        className="mask-in"
-        initial={{ y: "112%", rotate: 3 }}
-        {...trigger}
-        transition={{ duration: 1.15, delay, ease }}
-      >
-        {children}
-      </motion.span>
-    </span>
-  );
-}
-
-function Eyebrow({ children, light = false }) {
-  return (
-    <div className={`eyebrow ${light ? "eyebrow-light" : ""}`}>
-      <motion.span
-        className="eyebrow-line"
-        initial={{ scaleX: 0 }}
-        whileInView={{ scaleX: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1, ease }}
-      />
-      {children}
-    </div>
-  );
-}
-
-function Magnetic({ children }) {
-  const x = useSpring(useMotionValue(0), { stiffness: 220, damping: 16 });
-  const y = useSpring(useMotionValue(0), { stiffness: 220, damping: 16 });
-  const move = (e) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    x.set((e.clientX - r.left - r.width / 2) * 0.25);
-    y.set((e.clientY - r.top - r.height / 2) * 0.35);
-  };
-  const leave = () => { x.set(0); y.set(0); };
-  return (
-    <motion.div style={{ x, y, display: "inline-block" }} onMouseMove={move} onMouseLeave={leave}>
-      {children}
-    </motion.div>
-  );
-}
-
-/* Brand symbol — the G draws itself (triggered from the wrapper div so it always plays) */
-function BrandMark({ large = false }) {
-  const draw = (delay, dur = 2) => ({
-    hidden: { pathLength: 0, opacity: 0 },
-    show: { pathLength: 1, opacity: 1, transition: { duration: dur, delay, ease } },
-  });
-  return (
-    <motion.div
-      className={`brand-mark ${large ? "brand-mark-large" : ""}`}
+      variants={reveal}
       initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.1 }}
+      animate={isInView ? "visible" : "hidden"}
+      transition={{ delay }}
     >
-      <svg viewBox="0 0 180 180" role="img" aria-label="GHUGE GROUP geometric G emblem">
-        <defs>
-          <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#F0D6B1" />
-            <stop offset="48%" stopColor="#B98B60" />
-            <stop offset="100%" stopColor="#E4C49C" />
-          </linearGradient>
-        </defs>
-        <motion.circle cx="90" cy="90" r="78" fill="none" stroke="url(#goldGradient)" strokeWidth="0.8" variants={draw(0.2, 2.4)} />
-        <circle cx="90" cy="90" r="67" fill="none" stroke="url(#goldGradient)" strokeWidth="0.6" strokeDasharray="2 6" opacity="0.5" />
-        <motion.path
-          d="M119 53 C105 39 78 39 61 54 C43 70 39 99 53 119 C68 141 99 146 120 130 C133 120 140 101 137 84 L94 84"
-          fill="none" stroke="url(#goldGradient)" strokeWidth="5" strokeLinecap="square" variants={draw(0.4, 2)}
-        />
-        <motion.path d="M92 84 L138 84 L138 112" fill="none" stroke="url(#goldGradient)" strokeWidth="2" variants={draw(1.8, 1)} />
-        <motion.circle
-          cx="90" cy="90" r="3" fill="#E4C49C"
-          style={{ transformBox: "fill-box", transformOrigin: "center" }}
-          variants={{ hidden: { scale: 0, opacity: 0 }, show: { scale: [0, 1.8, 1], opacity: 1, transition: { duration: 1, delay: 2.1 } } }}
-        />
-      </svg>
+      {children}
     </motion.div>
   );
 }
 
-/* ---------- navigation ---------- */
-
-function Navigation() {
-  const [menuOpen, setMenuOpen] = React.useState(false);
-  const [hidden, setHidden] = React.useState(false);
-  const [solid, setSolid] = React.useState(false);
-  const { scrollY } = useScroll();
-
-  useMotionValueEvent(scrollY, "change", (v) => {
-    const prev = scrollY.getPrevious() ?? 0;
-    setHidden(v > prev && v > 240 && !menuOpen);
-    setSolid(v > 40);
-  });
-
-  const links = [["THE GROUP", "#group"], ["PORTFOLIO", "#portfolio"], ["LEADERSHIP", "#leadership"], ["CONTACT", "#contact"]];
-
-  return (
-    <motion.header
-      className={`site-nav ${solid ? "site-nav-solid" : ""}`}
-      initial={{ y: -90 }}
-      animate={{ y: hidden ? -90 : 0 }}
-      transition={{ duration: 0.6, ease }}
-    >
-      <a href="#home" className="nav-brand" aria-label="GHUGE GROUP home">
-        <span className="nav-brand-symbol">G.</span>
-        <span>GHUGE<small>GROUP</small></span>
-      </a>
-
-      <nav className={`nav-links ${menuOpen ? "nav-links-open" : ""}`}>
-        {links.map(([label, href]) => (
-          <a key={label} href={href} onClick={() => setMenuOpen(false)}><i />{label}</a>
-        ))}
-      </nav>
-
-      <a href="#contact" className="nav-cta">LET'S CONNECT <ArrowUpRight size={14} /></a>
-
-      <button className="nav-menu-button" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>
-        {menuOpen ? <X size={21} /> : <Menu size={21} />}
-      </button>
-    </motion.header>
-  );
-}
-
-/* ---------- hero ---------- */
-
-function Hero() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const textY = useTransform(scrollYProgress, [0, 1], [0, 140]);
-  const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
-  const symY = useTransform(scrollYProgress, [0, 1], [0, -90]);
-
-  const mx = useSpring(useMotionValue(0), { stiffness: 60, damping: 18 });
-  const my = useSpring(useMotionValue(0), { stiffness: 60, damping: 18 });
-  const onMove = (e) => {
-    mx.set((e.clientX / window.innerWidth - 0.5) * 36);
-    my.set((e.clientY / window.innerHeight - 0.5) * 36);
-  };
-
-  return (
-    <section className="hero" id="home" ref={ref} onMouseMove={onMove}>
-      <div className="hero-grain" />
-      <div className="hero-grid" />
-      <motion.div className="hero-glow" animate={{ scale: [1, 1.25, 1], opacity: [0.7, 1, 0.7] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }} />
-
-      <motion.div className="hero-content" style={{ y: textY, opacity: fade }}>
-        <motion.div className="hero-kicker" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, delay: 0.2 }}>
-          <span />AN INDEPENDENT BUSINESS HOUSE
-        </motion.div>
-
-        <h1>
-          <Mask now delay={0.3}>GHUGE</Mask>
-          <Mask now delay={0.45}><em>GROUP.</em></Mask>
-        </h1>
-
-        <motion.div className="hero-divider" initial={{ width: 0 }} animate={{ width: 78 }} transition={{ duration: 1.2, delay: 1.1, ease }} />
-
-        <p className="hero-tagline">
-          <Mask now delay={1.2}>Built with vision.</Mask>
-          <Mask now delay={1.35}><span>Driven by ambition.</span></Mask>
-        </p>
-
-        <motion.p className="hero-description" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 1.7 }}>
-          A group of independent businesses, brought together by enterprise, purpose and the ambition to create what comes next.
-        </motion.p>
-
-        <motion.a href="#group" className="hero-explore" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }}>
-          EXPLORE GHUGE GROUP
-          <motion.span animate={{ y: [0, 5, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}>
-            <ArrowDown size={15} />
-          </motion.span>
-        </motion.a>
-      </motion.div>
-
-      <motion.div className="hero-symbol-wrap" style={{ y: symY }} initial={{ opacity: 0, scale: 0.8, rotate: -14 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ duration: 1.8, ease }}>
-        <motion.div className="hero-symbol-inner" style={{ x: mx, y: my }}>
-          <motion.div className="symbol-orbit orbit-one" animate={{ rotate: 360 }} transition={{ duration: 55, repeat: Infinity, ease: "linear" }} />
-          <motion.div className="symbol-orbit orbit-two" animate={{ rotate: -360 }} transition={{ duration: 38, repeat: Infinity, ease: "linear" }} />
-          <motion.div className="symbol-orbit orbit-three" animate={{ rotate: 360 }} transition={{ duration: 75, repeat: Infinity, ease: "linear" }} />
-          <motion.div className="hero-symbol-core" animate={{ y: [0, -10, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}>
-            <BrandMark large />
-          </motion.div>
-          <span className="orbit-caption orbit-caption-top">VISION</span>
-          <span className="orbit-caption orbit-caption-bottom">ENTERPRISE</span>
-          <motion.span className="orbit-dot orbit-dot-one" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 3, repeat: Infinity }} />
-          <motion.span className="orbit-dot orbit-dot-two" animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 3.6, repeat: Infinity }} />
-        </motion.div>
-      </motion.div>
-
-      <div className="hero-bottom">
-        <span>INDEPENDENT VENTURES · ONE VISION</span>
-        <span>SCROLL TO DISCOVER ↓</span>
-      </div>
-      <div className="hero-side-index">01 — THE BEGINNING</div>
-    </section>
-  );
-}
-
-/* ---------- marquee ---------- */
-
-function Marquee() {
-  const words = ["VISION", "ENTERPRISE", "INDEPENDENCE", "AMBITION", "POSSIBILITY", "GROWTH"];
-  const row = [...words, ...words].map((w, i) => (<span key={i}>{w}<b>G</b></span>));
-  return (
-    <div className="marquee" aria-hidden="true">
-      <div className="marquee-track">{row}{row}</div>
-    </div>
-  );
-}
-
-/* ---------- group story ---------- */
-
-function GroupStory() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const decoX = useTransform(scrollYProgress, [0, 1], [120, -120]);
-  const numY = useTransform(scrollYProgress, [0, 1], [30, -30]);
-
-  return (
-    <section className="group-story" id="group" ref={ref}>
-      <div className="story-topline">
-        <Eyebrow>WHO WE ARE</Eyebrow>
-        <span className="story-reference">GHUGE GROUP / 001</span>
-      </div>
-
-      <div className="story-main">
-        <motion.div className="story-number" style={{ y: numY }}>01</motion.div>
-        <h2>
-          <Mask>One vision.</Mask>
-          <Mask delay={0.15}><em>Many directions.</em></Mask>
-        </h2>
-      </div>
-
-      <div className="story-description-row">
-        <div className="story-vertical-label">OUR PERSPECTIVE</div>
-        <Reveal>
-          <p className="story-large-copy">We believe in building businesses with their own identity, purpose and potential.</p>
-          <p className="story-small-copy">
-            GHUGE GROUP is the parent business group bringing together independent ventures across different fields. Each business has its own direction, while contributing to a wider vision of entrepreneurship and growth.
-          </p>
-        </Reveal>
-      </div>
-
-      <motion.div className="story-decoration" style={{ x: decoX }} aria-hidden="true">
-        <span>G</span><span>G</span><span>G</span>
-      </motion.div>
-
-      <div className="story-bottomline">
-        <span>BUILT ON ENTERPRISE</span>
-        <span>DEFINED BY POSSIBILITY</span>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- philosophy (words light up as you scroll) ---------- */
-
-function Word({ children, progress, range, em }) {
-  const opacity = useTransform(progress, range, [0.16, 1]);
-  return <motion.span className={em ? "w w-em" : "w"} style={{ opacity }}>{children}</motion.span>;
-}
-
-function Philosophy() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 85%", "end 55%"] });
-  const lines = [
-    { t: "Different industries.", em: false },
-    { t: "Different opportunities.", em: true },
-    { t: "One forward vision.", em: false },
-  ];
-  const total = lines.reduce((n, l) => n + l.t.split(" ").length, 0);
-  let i = 0;
-
-  const orbitRotate = useTransform(scrollYProgress, [0, 1], [0, 90]);
-
-  return (
-    <section className="philosophy">
-      <div className="philosophy-inner">
-        <Reveal><Eyebrow light>OUR PHILOSOPHY</Eyebrow></Reveal>
-
-        <h2 ref={ref}>
-          {lines.map((l) => (
-            <span className="ph-line" key={l.t}>
-              {l.t.split(" ").map((w) => {
-                const s = i / total;
-                const e = (i + 1) / total;
-                i += 1;
-                return <Word key={i} progress={scrollYProgress} range={[s, Math.min(e + 0.1, 1)]} em={l.em}>{w}{" "}</Word>;
-              })}
-            </span>
-          ))}
-        </h2>
-
-        <div className="philosophy-bottom">
-          <span className="philosophy-index">THE GHUGE GROUP APPROACH</span>
-          <Reveal>
-            <p>We see every venture as an opportunity to build something meaningful. Our focus is on developing businesses with clarity, independence and a long-term outlook.</p>
-          </Reveal>
-        </div>
-
-        <motion.div className="philosophy-orbit" style={{ rotate: orbitRotate }} aria-hidden="true">
-          <div /><div /><div /><span>G</span>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- portfolio ---------- */
-
-function TiltArt({ venture }) {
-  const rx = useSpring(useMotionValue(0), { stiffness: 120, damping: 15 });
-  const ry = useSpring(useMotionValue(0), { stiffness: 120, damping: 15 });
-  const move = (e) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    ry.set(((e.clientX - r.left) / r.width - 0.5) * 9);
-    rx.set(-((e.clientY - r.top) / r.height - 0.5) * 9);
-  };
-  const leave = () => { rx.set(0); ry.set(0); };
-
-  return (
-    <motion.div className="tilt" style={{ rotateX: rx, rotateY: ry }} onMouseMove={move} onMouseLeave={leave}>
-      <div className="portfolio-art">
-        <motion.div className="portfolio-art-ring ring-a" animate={{ rotate: 360 }} transition={{ duration: 60, repeat: Infinity, ease: "linear" }} />
-        <motion.div className="portfolio-art-ring ring-b" animate={{ rotate: -360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }} />
-        <div className="portfolio-art-ring ring-c" />
-        <div className="portfolio-art-cross cross-a" />
-        <div className="portfolio-art-cross cross-b" />
-        <motion.span className="portfolio-art-letter" initial={{ scale: 0.7, opacity: 0, filter: "blur(14px)" }} animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }} transition={{ duration: 0.8, ease }}>
-          {venture.symbol}
-        </motion.span>
-        <span className="portfolio-art-detail">{venture.detail}</span>
-        <span className="portfolio-art-coordinate">GG — {venture.number}</span>
-      </div>
-    </motion.div>
-  );
-}
-
-function Portfolio() {
-  const [active, setActive] = React.useState(0);
-  const v = ventures[active];
-
-  return (
-    <section className="portfolio" id="portfolio">
-      <div className="portfolio-heading">
-        <div>
-          <Eyebrow>THE PORTFOLIO</Eyebrow>
-          <h2>
-            <Mask>Our businesses.</Mask>
-            <Mask delay={0.15}><em>Our individual identities.</em></Mask>
-          </h2>
-        </div>
-        <Reveal delay={0.15}>
-          <p>A growing collection of independent ventures, each operating in its own field and building its own identity.</p>
-        </Reveal>
-      </div>
-
-      <div className="portfolio-layout">
-        <div className="portfolio-index">
-          <span>SELECT A VENTURE</span>
-          {ventures.map((item, index) => (
-            <button key={item.number} className={active === index ? "portfolio-tab active" : "portfolio-tab"} onClick={() => setActive(index)} aria-pressed={active === index}>
-              <span>{item.number}</span>
-              {item.name}
-              <ArrowUpRight size={15} />
-              {active === index && <motion.i className="tab-underline" layoutId="tab-underline" transition={{ duration: 0.5, ease }} />}
-            </button>
-          ))}
-          <div className="portfolio-index-note">THREE VENTURES<br />ONE GROUP</div>
-        </div>
-
-        <div className="portfolio-display">
-          <AnimatePresence mode="wait">
-            <motion.div key={active} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.45, ease }}>
-              <div className="portfolio-display-top">
-                <span>{v.category}</span>
-                <span>{v.number} / 03</span>
-              </div>
-
-              <TiltArt venture={v} />
-
-              <div className="portfolio-display-bottom">
-                <div>
-                  <span className="portfolio-status">
-                    <motion.i animate={{ scale: [1, 1.8, 1], opacity: [1, 0.4, 1] }} transition={{ duration: 2, repeat: Infinity }} /> {v.status}
-                  </span>
-                  <h3>{v.name}</h3>
-                  <p>{v.description}</p>
-                </div>
-                {v.href ? (
-                  <a href={v.href} target="_blank" rel="noreferrer" className="portfolio-open" aria-label={`Visit ${v.name}`}>
-                    <ArrowUpRight size={22} />
-                  </a>
-                ) : (
-                  <span className="portfolio-open portfolio-open-static"><ArrowUpRight size={22} /></span>
-                )}
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
-
-      <div className="portfolio-footnote">
-        <span>01 — 03</span>
-        <span>AN EVOLVING PORTFOLIO</span>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- founder ---------- */
-
-function Founder() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const markY = useTransform(scrollYProgress, [0, 1], [-120, 160]);
-
-  return (
-    <section className="founder" id="leadership" ref={ref}>
-      <motion.div className="founder-background-mark" style={{ y: markY }}>G</motion.div>
-
-      <div className="founder-top">
-        <Eyebrow light>LEADERSHIP</Eyebrow>
-        <span>THE PEOPLE BEHIND THE VISION</span>
-      </div>
-
-      <div className="founder-heading">
-        <h2>
-          <Mask>Every journey</Mask>
-          <Mask delay={0.15}>begins with <em>a vision.</em></Mask>
-        </h2>
-      </div>
-
-      <div className="founder-profile">
-        <Reveal>
-          <div className="founder-monogram">
-            <span>V</span>
-            <small>FOUNDER</small>
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.2}>
-          <div className="founder-information">
-            <span className="founder-label">FOUNDER · GHUGE GROUP</span>
-            <h3>Vedant Ghuge</h3>
-            <motion.div className="founder-line" initial={{ width: 0 }} whileInView={{ width: 50 }} viewport={{ once: true }} transition={{ duration: 1, delay: 0.5 }} />
-            <p>The founder of GHUGE GROUP, bringing an entrepreneurial vision to building businesses, exploring opportunities and shaping what comes next.</p>
-          </div>
-        </Reveal>
-      </div>
-
-      <div className="founder-bottom">
-        <span>VISION</span><span>INITIATIVE</span><span>FORWARD THINKING</span>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- family ---------- */
-
-function Family() {
-  const inView = { once: true, amount: 0.4 };
-  return (
-    <section className="family">
-      <div className="family-heading">
-        <div>
-          <Eyebrow>ROOTS & FOUNDATIONS</Eyebrow>
-          <h2>
-            <Mask>The people.</Mask>
-            <Mask delay={0.15}><em>The foundation.</em></Mask>
-          </h2>
-        </div>
-        <Reveal delay={0.15}>
-          <p>Family is part of the story behind GHUGE GROUP. Its roots and relationships form a meaningful part of the journey.</p>
-        </Reveal>
-      </div>
-
-      <div className="family-visual">
-        <motion.div className="family-person" initial={{ opacity: 0, y: -18 }} whileInView={{ opacity: 1, y: 0 }} viewport={inView} transition={{ duration: 0.9, ease }}>
-          <span>FATHER</span><strong>Somnath Ghuge</strong>
-        </motion.div>
-
-        <motion.div className="family-stem" initial={{ scaleY: 0 }} whileInView={{ scaleY: 1 }} viewport={inView} transition={{ duration: 0.7, delay: 0.4 }} />
-        <motion.div className="family-horizontal" initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={inView} transition={{ duration: 0.9, delay: 1 }} />
-
-        <div className="family-sons">
-          <motion.div className="family-person" initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={inView} transition={{ duration: 0.9, delay: 1.7, ease }}>
-            <span>SON</span><strong>Harshal Ghuge</strong>
-          </motion.div>
-          <motion.div className="family-person family-vedant" initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={inView} transition={{ duration: 0.9, delay: 1.9, ease }}>
-            <span>SON · FOUNDER</span><strong>Vedant Ghuge</strong>
-          </motion.div>
-        </div>
-      </div>
-
-      <div className="family-caption">
-        <span>A FAMILY CONNECTION</span>
-        <span>PART OF THE GHUGE GROUP STORY</span>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- contact ---------- */
-
-function Contact() {
-  return (
-    <section className="contact" id="contact">
-      <div className="contact-decoration"><BrandMark large /></div>
-
-      <div className="contact-content">
-        <Eyebrow light>THE NEXT CHAPTER</Eyebrow>
-        <h2>
-          <Mask>Let's build</Mask>
-          <Mask delay={0.15}><em>what comes next.</em></Mask>
-        </h2>
-        <Reveal delay={0.3}>
-          <p>For business conversations, collaborations and partnership opportunities, connect with us.</p>
-          <Magnetic>
-            <a href="mailto:connect@uplyftbusiness.com" className="contact-link">
-              START A CONVERSATION
-              <span><ArrowUpRight size={18} /></span>
-            </a>
-          </Magnetic>
-          <small>Contact currently uses the UpLyftBusiness email address.</small>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- page (footer lives in your Footer.jsx) ---------- */
+/* ----------------------------------------
+   MAIN COMPONENT
+---------------------------------------- */
 
 export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
+
   const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 24 });
+
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  const closeMenu = () => setMenuOpen(false);
+
+  const businesses = [
+    {
+      number: "01",
+      name: "Laxmi Gas",
+      category: "Energy & Distribution",
+      status: "Operating",
+      description:
+        "Building dependable energy and distribution solutions through operational excellence.",
+      letter: "L",
+      className: "gas",
+      link: null,
+      icon: <Building2 size={25} strokeWidth={1.3} />,
+    },
+    {
+      number: "02",
+      name: "UpLyftBusiness",
+      category: "Digital & Technology",
+      status: "Operating",
+      description:
+        "Helping businesses grow through digital experiences, technology and creative solutions.",
+      letter: "U",
+      className: "uplyft",
+      link: "https://www.uplyftbusiness.com",
+      icon: <Globe2 size={25} strokeWidth={1.3} />,
+    },
+    {
+      number: "03",
+      name: "Sports Academy",
+      category: "Sports & Development",
+      status: "Coming Soon",
+      description:
+        "A future initiative focused on sports, discipline, development and opportunity.",
+      letter: "S",
+      className: "sports",
+      link: null,
+      icon: <Compass size={25} strokeWidth={1.3} />,
+    },
+  ];
 
   return (
-    <div className="ghuge-site">
+    <div className="ghuge-home">
+
+      {/* SCROLL PROGRESS */}
+
+      <motion.div
+        className="scroll-progress"
+        style={{ scaleX }}
+      />
+
+      {/* NAVIGATION */}
+
+      <header className="navbar">
+        <a href="#home" className="brand" onClick={closeMenu}>
+          <span className="brand-symbol">G</span>
+
+          <span className="brand-name">
+            GHUGE
+            <small>GROUP</small>
+          </span>
+        </a>
+
+        <nav className={`nav-links ${menuOpen ? "nav-open" : ""}`}>
+          <a href="#story" onClick={closeMenu}>The Group</a>
+          <a href="#businesses" onClick={closeMenu}>Our Businesses</a>
+          <a href="#philosophy" onClick={closeMenu}>Our Vision</a>
+          <a href="/leadership" onClick={closeMenu}>Leadership</a>
+
+          <a
+            href="#contact"
+            className="nav-mobile-contact"
+            onClick={closeMenu}
+          >
+            Let's Connect <ArrowUpRight size={17} />
+          </a>
+        </nav>
+
+        <a href="#contact" className="nav-cta">
+          Let's Connect <ArrowUpRight size={16} />
+        </a>
+
+        <button
+          className="menu-toggle"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle navigation"
+          aria-expanded={menuOpen}
+        >
+          {menuOpen ? <X /> : <Menu />}
+        </button>
+      </header>
+
+      {/* HERO */}
+
+      <section className="hero" id="home">
+        <div className="hero-grid-pattern" />
+        <div className="hero-glow hero-glow-one" />
+        <div className="hero-glow hero-glow-two" />
+
+        <div className="hero-inner">
+
+          <div className="hero-content">
+            <motion.div
+              className="hero-eyebrow"
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <span className="eyebrow-dot" />
+              AN INDEPENDENT BUSINESS GROUP
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 35 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.12, ease }}
+            >
+              Built with
+              <br />
+              vision. Driven
+              <br />
+              by <em>ambition.</em>
+            </motion.h1>
+
+            <motion.p
+              className="hero-description"
+              initial={{ opacity: 0, y: 22 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.3 }}
+            >
+              A growing group of businesses united by a shared
+              vision to create meaningful progress, lasting value
+              and opportunities for the future.
+            </motion.p>
+
+            <motion.div
+              className="hero-actions"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.45 }}
+            >
+              <a href="#businesses" className="hero-button">
+                Explore the Group
+                <ArrowUpRight size={18} />
+              </a>
+
+              <a href="#story" className="hero-text-link">
+                Discover our story
+                <ArrowRight size={16} />
+              </a>
+            </motion.div>
+
+            <motion.div
+              className="hero-trust-line"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 1 }}
+            >
+              <span className="trust-line" />
+              <span>BUILDING WITH PURPOSE. GROWING WITH INTENT.</span>
+            </motion.div>
+          </div>
+
+          {/* ABSTRACT BRAND EMBLEM — NO PHOTOGRAPH */}
+
+          <motion.div
+            className="hero-visual"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.3, delay: 0.2, ease }}
+          >
+            <div className="visual-top-label">
+              <span>ESTABLISHING</span>
+              <span>NEW POSSIBILITIES</span>
+            </div>
+
+            <div className="emblem-stage">
+              <div className="emblem-orbit orbit-one" />
+              <div className="emblem-orbit orbit-two" />
+              <div className="emblem-orbit orbit-three" />
+
+              <motion.div
+                className="emblem-orbit-dot"
+                animate={reduceMotion ? {} : { rotate: 360 }}
+                transition={{
+                  duration: 22,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+              >
+                <span />
+              </motion.div>
+
+              <motion.div
+                className="hero-emblem"
+                animate={reduceMotion ? {} : {
+                  y: [0, -10, 0],
+                }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                <div className="emblem-inner">
+                  <span>G</span>
+                  <div className="emblem-divider" />
+                  <small>GHUGE GROUP</small>
+                </div>
+              </motion.div>
+            </div>
+
+            <div className="visual-bottom-label">
+              <span className="visual-bottom-line" />
+              <span>ONE VISION. MANY POSSIBILITIES.</span>
+            </div>
+
+            <div className="visual-side-note">
+              <span>01</span>
+              <span>GROUP</span>
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="hero-bottom">
+          <span>INDIA · BUILDING FOR TOMORROW</span>
+
+          <a href="#story">
+            SCROLL TO EXPLORE
+            <span className="scroll-arrow">↓</span>
+          </a>
+        </div>
+      </section>
+
+      {/* BRAND MARQUEE */}
+
+      <section className="marquee">
+        <div className="marquee-track">
+          {[0, 1].map((item) => (
+            <div className="marquee-content" key={item}>
+              <span>VISION</span>
+              <b>✳</b>
+              <span>INNOVATION</span>
+              <b>✳</b>
+              <span>GROWTH</span>
+              <b>✳</b>
+              <span>LEGACY</span>
+              <b>✳</b>
+              <span>OPPORTUNITY</span>
+              <b>✳</b>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* GROUP STORY */}
+
+      <section className="group-story section" id="story">
+        <div className="section-container story-grid">
+
+          <Reveal className="story-label">
+            <span className="section-kicker">
+              <span /> WHO WE ARE
+            </span>
+
+            <span className="story-index">
+              01 / THE GROUP
+            </span>
+          </Reveal>
+
+          <Reveal className="story-main">
+            <h2>
+              Different ventures.
+              <br />
+              <em>One bigger vision.</em>
+            </h2>
+
+            <p className="story-lead">
+              GHUGE GROUP is a growing business group bringing
+              together ventures across different industries under
+              a common vision of progress.
+            </p>
+
+            <p className="story-copy">
+              We believe in building businesses with purpose,
+              creating opportunities and developing ideas into
+              meaningful enterprises. Each venture has its own
+              identity, while contributing to a larger ambition.
+            </p>
+
+            <a href="#businesses" className="underlined-link">
+              Explore our businesses
+              <ArrowUpRight size={17} />
+            </a>
+          </Reveal>
+
+          <Reveal className="story-decoration">
+            <div className="story-mark">G.</div>
+
+            <div className="story-decoration-caption">
+              <Sparkles size={15} />
+              <span>GROWING WITH PURPOSE</span>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* GROUP PRINCIPLES */}
+
+      <section className="principles">
+        <div className="section-container principles-grid">
+
+          <Reveal className="principle-item">
+            <span className="principle-number">01</span>
+            <div className="principle-icon">
+              <Compass size={22} strokeWidth={1.4} />
+            </div>
+            <h3>Purpose</h3>
+            <p>
+              Every venture begins with a clear reason to exist
+              and a meaningful direction.
+            </p>
+          </Reveal>
+
+          <Reveal className="principle-item" delay={0.12}>
+            <span className="principle-number">02</span>
+            <div className="principle-icon">
+              <Layers3 size={22} strokeWidth={1.4} />
+            </div>
+            <h3>Possibility</h3>
+            <p>
+              We look beyond boundaries and remain open to
+              ideas, industries and opportunities.
+            </p>
+          </Reveal>
+
+          <Reveal className="principle-item" delay={0.24}>
+            <span className="principle-number">03</span>
+            <div className="principle-icon">
+              <MoveUpRight size={22} strokeWidth={1.4} />
+            </div>
+            <h3>Progress</h3>
+            <p>
+              We value consistent effort, thoughtful decisions
+              and sustainable growth.
+            </p>
+          </Reveal>
+
+        </div>
+      </section>
+
+      {/* PHILOSOPHY */}
+
+      <section className="philosophy section" id="philosophy">
+        <div className="philosophy-glow" />
+        <div className="philosophy-outline" />
+
+        <div className="section-container philosophy-inner">
+          <Reveal>
+            <span className="section-kicker light-kicker">
+              <span /> WHAT DRIVES US
+            </span>
+          </Reveal>
+
+          <Reveal>
+            <h2>
+              Think beyond
+              <br />
+              <em>the ordinary.</em>
+            </h2>
+          </Reveal>
+
+          <div className="philosophy-bottom">
+            <Reveal>
+              <p>
+                Our approach is rooted in ambition, adaptability
+                and the belief that meaningful businesses are
+                built through consistent effort and a long-term vision.
+              </p>
+            </Reveal>
+
+            <Reveal delay={0.15}>
+              <div className="philosophy-symbol">
+                <Layers3 size={29} strokeWidth={1.2} />
+              </div>
+            </Reveal>
+          </div>
+
+          <div className="philosophy-index">
+            OUR APPROACH <span>—</span> LONG-TERM THINKING
+          </div>
+        </div>
+      </section>
+
+      {/* BUSINESS PORTFOLIO */}
+
+      <section className="portfolio section" id="businesses">
+        <div className="section-container">
+
+          <div className="portfolio-top">
+            <Reveal>
+              <span className="section-kicker">
+                <span /> OUR PORTFOLIO
+              </span>
+
+              <h2>
+                Businesses built
+                <br />
+                for <em>possibilities.</em>
+              </h2>
+            </Reveal>
+
+            <Reveal delay={0.15}>
+              <p className="portfolio-intro">
+                Every venture represents a different opportunity.
+                Together, they shape the evolving GHUGE GROUP ecosystem.
+              </p>
+            </Reveal>
+          </div>
+
+          <div className="business-grid">
+            {businesses.map((business, index) => (
+              <Reveal
+                key={business.number}
+                delay={index * 0.12}
+                className="business-reveal"
+              >
+                <motion.div
+                  className={`business-card ${business.className}`}
+                  whileHover={{ y: -8 }}
+                  transition={{ duration: 0.35, ease }}
+                >
+                  <div className="business-card-top">
+                    <span>{business.number} / VENTURE</span>
+
+                    <span className="business-status">
+                      <i /> {business.status}
+                    </span>
+                  </div>
+
+                  <div className="business-art">
+                    <div className="business-art-ring ring-one" />
+                    <div className="business-art-ring ring-two" />
+
+                    <div className="business-art-icon">
+                      {business.icon}
+                    </div>
+
+                    <div className="business-art-letter">
+                      {business.letter}
+                    </div>
+
+                    <span className="business-art-spark">✳</span>
+                  </div>
+
+                  <div className="business-card-bottom">
+                    <div>
+                      <span className="business-category">
+                        {business.category}
+                      </span>
+
+                      <h3>{business.name}</h3>
+
+                      <p>{business.description}</p>
+                    </div>
+
+                    {business.link ? (
+                      <a
+                        href={business.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="business-arrow"
+                        aria-label={`Visit ${business.name}`}
+                      >
+                        <ArrowUpRight size={21} />
+                      </a>
+                    ) : (
+                      <span
+                        className="business-arrow business-arrow-static"
+                        aria-hidden="true"
+                      >
+                        <ArrowUpRight size={21} />
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal className="portfolio-note">
+            <span>MORE TO COME</span>
+
+            <p>
+              Our journey continues as we explore new industries,
+              ideas and opportunities.
+            </p>
+
+            <Sparkles size={19} />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* LEADERSHIP DIRECTION */}
+
+      <section className="founder section" id="leadership">
+        <div className="founder-decoration">
+          <div className="founder-circle founder-circle-one" />
+          <div className="founder-circle founder-circle-two" />
+          <div className="founder-circle founder-circle-three" />
+        </div>
+
+        <div className="section-container founder-grid">
+
+          <Reveal className="founder-visual">
+            <div className="founder-monogram">
+              <div className="founder-monogram-inner">
+                <span>G</span>
+                <div className="founder-monogram-line" />
+                <small>GHUGE GROUP</small>
+              </div>
+            </div>
+
+            <span className="founder-visual-caption">
+              BUILT ON VISION
+            </span>
+          </Reveal>
+
+          <Reveal className="founder-content">
+            <span className="section-kicker light-kicker">
+              <span /> LEADERSHIP & DIRECTION
+            </span>
+
+            <h2>
+              Strong foundations.
+              <br />
+              <em>Forward thinking.</em>
+            </h2>
+
+            <p>
+              Every growing organisation needs a clear direction,
+              strong values and the determination to keep moving
+              forward. At GHUGE GROUP, our focus is on building
+              businesses with a long-term perspective.
+            </p>
+
+            <div className="founder-divider" />
+
+            <a href="/leadership" className="founder-link">
+              Discover our leadership
+              <ArrowUpRight size={18} />
+            </a>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* CONTACT */}
+
+      <section className="contact section" id="contact">
+        <div className="contact-orb contact-orb-one" />
+        <div className="contact-orb contact-orb-two" />
+
+        <div className="section-container contact-inner">
+          <Reveal>
+            <span className="section-kicker light-kicker">
+              <span /> LET'S BUILD SOMETHING
+            </span>
+          </Reveal>
+
+          <Reveal>
+            <h2>
+              The future is
+              <br />
+              <em>built together.</em>
+            </h2>
+          </Reveal>
+
+          <Reveal delay={0.15}>
+            <p>
+              Have an idea, a business opportunity or a reason
+              to connect? We would be glad to hear from you.
+            </p>
+
+            <a
+              href="mailto:info@ghugegroup.com"
+              className="contact-button"
+            >
+              Get in touch
+              <ArrowUpRight size={19} />
+            </a>
+          </Reveal>
+
+          <div className="contact-bottom-note">
+            GHUGE GROUP <span>·</span> INDIA
+          </div>
+        </div>
+      </section>
+
+      {/* STYLES */}
+
       <style>{styles}</style>
-      <motion.div className="scroll-progress" style={{ scaleX }} />
-      <Navigation />
-      <main>
-        <Hero />
-        <Marquee />
-        <GroupStory />
-        <Philosophy />
-        <Portfolio />
-        <Founder />
-        <Family />
-        <Contact />
-      </main>
     </div>
   );
 }
 
-/* ---------- styles ---------- */
+/* ----------------------------------------
+   STYLES
+---------------------------------------- */
 
 const styles = `
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap');
 
-:root{--wine:#351820;--wine-deep:#241419;--wine-mid:#51232D;--wine-soft:#713844;--cream:#F4E8DA;--cream-dark:#E9D8C9;--gold:#C7A47B;--gold-light:#E4C49C;--rose:#C99B91;--ink:#291B1E;--muted:#897775}
-html{scroll-behavior:smooth;scroll-padding-top:78px}
-body{margin:0}
-.ghuge-site{overflow-x:clip;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif}
-.ghuge-site *{box-sizing:border-box}
-.ghuge-site a{text-decoration:none}
-.ghuge-site button{font:inherit}
-.scroll-progress{position:fixed;z-index:200;top:0;left:0;right:0;height:2px;background:var(--gold);transform-origin:left}
-
-.mask{display:block;overflow:hidden;padding:.16em .22em .26em .1em;margin:-.16em -.22em -.26em -.1em}
-.mask-in{display:block;will-change:transform;transform-origin:left bottom}
-.hero h1 .mask{padding-right:.3em;margin-right:-.3em}
-
-.brand-mark{width:42px;height:42px}
-.brand-mark svg{display:block;width:100%;height:100%}
-.brand-mark-large{width:100%;height:100%}
-
-.eyebrow{display:flex;align-items:center;gap:12px;color:var(--wine);font-size:9px;font-weight:700;letter-spacing:3px}
-.eyebrow-line{display:block;width:29px;height:1px;background:var(--gold);transform-origin:left}
-.eyebrow-light{color:var(--gold-light)}
-
-/* nav */
-.site-nav{height:78px;position:sticky;top:0;z-index:100;padding:0 7%;display:flex;align-items:center;justify-content:space-between;background:rgba(244,232,218,.9);border-bottom:1px solid rgba(81,35,45,.08);backdrop-filter:blur(18px);transition:background .4s,border-color .4s,box-shadow .4s}
-.site-nav-solid{background:rgba(244,232,218,.97);border-bottom-color:rgba(81,35,45,.14);box-shadow:0 10px 40px -20px rgba(53,24,32,.35)}
-.nav-brand{display:flex;align-items:center;gap:11px;color:var(--wine);font-size:11px;font-weight:700;letter-spacing:3px}
-.nav-brand-symbol{font:38px 'Playfair Display',serif}
-.nav-brand small{display:block;font-size:8px;letter-spacing:5px;margin-top:4px}
-.nav-links{display:flex;gap:32px}
-.nav-links a,.nav-cta{color:#655151;font-size:9px;font-weight:600;letter-spacing:1.5px;transition:color .3s}
-.nav-links a{position:relative;padding:6px 0}
-.nav-links a i{position:absolute;left:0;bottom:0;height:1px;width:100%;background:var(--gold);transform:scaleX(0);transform-origin:right;transition:transform .5s cubic-bezier(.22,1,.36,1)}
-.nav-links a:hover i{transform:scaleX(1);transform-origin:left}
-.nav-links a:hover,.nav-cta:hover{color:var(--gold)}
-.nav-cta{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--gold);padding-bottom:9px}
-.nav-cta svg{transition:transform .4s}
-.nav-cta:hover svg{transform:translate(3px,-3px)}
-.nav-menu-button{display:none;background:none;border:0;color:var(--wine);cursor:pointer}
-
-/* hero */
-.hero{min-height:790px;position:relative;overflow:hidden;display:flex;align-items:center;padding:100px 10%;color:var(--cream);background:radial-gradient(ellipse at 75% 45%,rgba(113,56,68,.4),transparent 42%),linear-gradient(115deg,#241419,#351820 55%,#45232D)}
-.hero:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(36,20,25,.4),transparent 80%)}
-.hero-grid{position:absolute;inset:0;opacity:.13;background-image:linear-gradient(rgba(228,196,156,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(228,196,156,.18) 1px,transparent 1px);background-size:100px 100px;mask-image:radial-gradient(ellipse at 80% 50%,black,transparent 75%);animation:gridDrift 24s linear infinite}
-@keyframes gridDrift{to{background-position:100px 100px}}
-.hero-grain{position:absolute;inset:0;opacity:.09;background-image:repeating-linear-gradient(0deg,transparent 0,rgba(255,255,255,.04) 1px,transparent 2px,transparent 4px);pointer-events:none}
-.hero-glow{position:absolute;width:480px;height:480px;right:10%;top:20%;border-radius:50%;background:rgba(201,155,145,.1);filter:blur(100px)}
-.hero-content{width:58%;position:relative;z-index:5}
-.hero-kicker{display:flex;align-items:center;gap:13px;color:var(--gold-light);font-size:9px;letter-spacing:3px}
-.hero-kicker span{width:30px;height:1px;background:var(--gold)}
-.hero h1{font:500 clamp(85px,12vw,155px)/.86 'Playfair Display',serif;letter-spacing:-7px;margin:48px 0 35px}
-.hero h1 em{color:var(--rose);font-weight:400}
-.hero-divider{height:1px;background:var(--gold);margin:40px 0 28px}
-.hero-tagline{font:31px/1.3 'Playfair Display',serif;margin:0}
-.hero-tagline span{color:var(--gold-light);font-style:italic}
-.hero-description{max-width:390px;color:rgba(244,232,218,.68);font-size:12px;line-height:2;margin-top:23px}
-.hero-explore{display:inline-flex;align-items:center;gap:20px;margin-top:39px;padding-bottom:13px;color:var(--cream);font-size:9px;letter-spacing:2px;border-bottom:1px solid var(--gold);transition:gap .4s}
-.hero-explore:hover{gap:30px}
-.hero-explore span{display:grid;place-items:center;color:var(--gold)}
-.hero-symbol-wrap{position:absolute;right:2%;top:50%;margin-top:-24%;width:48%;aspect-ratio:1;z-index:2}
-.hero-symbol-inner{position:absolute;inset:0;display:grid;place-items:center}
-.symbol-orbit{position:absolute;border:1px solid rgba(199,164,123,.28);border-radius:50%}
-.orbit-one{width:90%;height:48%;transform:rotate(-38deg)}
-.orbit-two{width:74%;height:92%;border-color:rgba(201,155,145,.25)}
-.orbit-three{width:84%;height:84%;border-style:dashed;border-color:rgba(244,232,218,.14)}
-.hero-symbol-core{width:48%;aspect-ratio:1;padding:22px;border:1px solid rgba(199,164,123,.7);border-radius:50%;background:radial-gradient(circle at 35% 25%,#70414A,#351820 72%);box-shadow:0 0 90px rgba(201,155,145,.13),inset 0 0 40px rgba(255,255,255,.04)}
-.orbit-caption{position:absolute;color:var(--gold);font-size:8px;letter-spacing:4px}
-.orbit-caption-top{top:12%;right:23%}
-.orbit-caption-bottom{bottom:12%;left:20%}
-.orbit-dot{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--gold-light);box-shadow:0 0 18px var(--gold)}
-.orbit-dot-one{top:19%;left:28%}
-.orbit-dot-two{bottom:20%;right:18%}
-.hero-bottom{position:absolute;bottom:27px;left:7%;right:7%;z-index:5;display:flex;justify-content:space-between;color:rgba(244,232,218,.42);font-size:8px;letter-spacing:2px}
-.hero-side-index{position:absolute;right:20px;top:50%;writing-mode:vertical-rl;color:rgba(244,232,218,.35);font-size:8px;letter-spacing:3px}
-
-/* marquee */
-.marquee{overflow:hidden;background:var(--wine-deep);border-top:1px solid rgba(228,196,156,.18);border-bottom:1px solid rgba(228,196,156,.18);padding:19px 0}
-.marquee-track{display:flex;width:max-content;animation:marquee 40s linear infinite}
-.marquee-track span{display:flex;align-items:center;gap:34px;padding-right:34px;color:var(--gold-light);font:italic 400 19px 'Playfair Display',serif;letter-spacing:4px;white-space:nowrap}
-.marquee-track b{font:400 15px 'Playfair Display',serif;color:var(--rose);opacity:.55}
-@keyframes marquee{to{transform:translateX(-50%)}}
-
-/* story */
-.group-story{position:relative;padding:120px 12% 75px;min-height:760px;overflow:hidden;background:var(--cream)}
-.story-topline,.story-bottomline{display:flex;align-items:center;justify-content:space-between}
-.story-reference,.story-bottomline{color:#A38D82;font-size:8px;letter-spacing:2px}
-.story-main{position:relative;z-index:2;margin-top:105px;display:flex;align-items:flex-start;gap:55px}
-.story-number{padding-top:15px;color:var(--gold);font:22px 'Playfair Display',serif}
-.story-main h2,.portfolio-heading h2,.family-heading h2{margin:0;font:500 clamp(55px,7vw,94px)/1.1 'Playfair Display',serif;letter-spacing:-2.5px}
-.story-main h2 em,.portfolio-heading h2 em,.family-heading h2 em{color:var(--wine-soft);font-weight:400}
-.story-description-row{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1.5fr;gap:50px;max-width:780px;margin:65px 0 70px auto}
-.story-vertical-label{color:var(--gold);font-size:8px;letter-spacing:3px;writing-mode:vertical-rl;transform:rotate(180deg);justify-self:start}
-.story-large-copy{font:25px/1.5 'Playfair Display',serif;color:var(--wine);margin:0 0 18px}
-.story-small-copy{max-width:500px;color:var(--muted);font-size:11px;line-height:2.1}
-.story-decoration{position:absolute;right:-15px;bottom:-180px;display:flex;font:330px/.8 'Playfair Display',serif;color:rgba(81,35,45,.035);pointer-events:none}
-.story-decoration span:nth-child(2){transform:translateX(-85px)}
-.story-decoration span:nth-child(3){transform:translateX(-170px)}
-.story-bottomline{border-top:1px solid rgba(81,35,45,.16);padding-top:22px;position:relative;z-index:2}
-
-/* philosophy */
-.philosophy{position:relative;overflow:hidden;padding:125px 12%;color:var(--cream);background:radial-gradient(ellipse at 90% 50%,rgba(113,56,68,.4),transparent 42%),var(--wine)}
-.philosophy-inner{position:relative;z-index:2}
-.philosophy h2{max-width:930px;margin:55px 0 70px;font:500 clamp(47px,6.7vw,84px)/1.17 'Playfair Display',serif;letter-spacing:-2px}
-.ph-line{display:block}
-.w{display:inline-block;white-space:pre}
-.w-em{color:var(--rose);font-weight:400;font-style:italic}
-.philosophy-bottom{display:flex;justify-content:space-between;align-items:flex-start;gap:50px;border-top:1px solid rgba(228,196,156,.25);padding-top:25px}
-.philosophy-index{color:var(--gold);font-size:8px;letter-spacing:2px}
-.philosophy-bottom p{max-width:420px;margin:0;color:rgba(244,232,218,.68);font-size:11px;line-height:2.1}
-.philosophy-orbit{position:absolute;width:440px;height:440px;right:-130px;top:70px;opacity:.13;pointer-events:none}
-.philosophy-orbit div{position:absolute;inset:0;border:1px solid var(--gold);border-radius:50%}
-.philosophy-orbit div:nth-child(2){inset:45px}
-.philosophy-orbit div:nth-child(3){inset:90px}
-.philosophy-orbit span{position:absolute;inset:0;display:grid;place-items:center;font:220px 'Playfair Display',serif;color:var(--gold)}
-
-/* portfolio */
-.portfolio{padding:120px 12% 75px;background:var(--cream-dark)}
-.portfolio-heading{display:grid;grid-template-columns:1.35fr .65fr;align-items:end;gap:50px}
-.portfolio-heading h2{margin-top:38px}
-.portfolio-heading>div:last-child p{max-width:300px;margin:0 0 8px;color:var(--muted);font-size:11px;line-height:2.1}
-.portfolio-layout{display:grid;grid-template-columns:.75fr 1.25fr;gap:65px;align-items:center;margin-top:85px}
-.portfolio-index>span{color:var(--gold);font-size:8px;letter-spacing:3px}
-.portfolio-tab{position:relative;width:100%;display:grid;grid-template-columns:35px 1fr 20px;align-items:center;gap:12px;padding:23px 0;text-align:left;border:0;border-bottom:1px solid rgba(81,35,45,.16);background:transparent;color:#846F6A;font:21px 'Playfair Display',serif;cursor:pointer;transition:color .4s,padding .4s}
-.portfolio-tab:first-of-type{margin-top:20px}
-.portfolio-tab>span{font:9px 'DM Sans',sans-serif;color:var(--gold)}
-.portfolio-tab svg{opacity:0;transition:opacity .3s,transform .3s}
-.portfolio-tab.active,.portfolio-tab:hover{color:var(--wine);padding-left:8px}
-.portfolio-tab.active svg,.portfolio-tab:hover svg{opacity:1;transform:translate(2px,-2px)}
-.tab-underline{position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--wine)}
-.portfolio-index-note{margin-top:40px;color:#A18C80;font-size:8px;line-height:2;letter-spacing:2px}
-.portfolio-display{min-width:0;perspective:1200px}
-.portfolio-display-top{display:flex;justify-content:space-between;color:#A18C80;font-size:8px;letter-spacing:2px;padding-bottom:15px}
-.tilt{transform-style:preserve-3d}
-.portfolio-art{position:relative;aspect-ratio:1.4;overflow:hidden;display:grid;place-items:center;background:radial-gradient(circle at 50% 48%,rgba(113,56,68,.9),transparent 38%),linear-gradient(135deg,#28171D,#51232D 60%,#29191D)}
-.portfolio-art:before,.portfolio-art:after{content:"";position:absolute;inset:0;pointer-events:none}
-.portfolio-art:before{background-image:linear-gradient(rgba(228,196,156,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(228,196,156,.12) 1px,transparent 1px);background-size:50px 50px;opacity:.25}
-.portfolio-art:after{border:1px solid rgba(228,196,156,.22);inset:15px}
-.portfolio-art-ring{position:absolute;border:1px solid rgba(228,196,156,.35);border-radius:50%}
-.ring-a{width:65%;height:65%;border-style:dotted}
-.ring-b{width:45%;height:45%;border-style:dashed}
-.ring-c{width:85%;height:85%;border-color:rgba(228,196,156,.15)}
-.portfolio-art-letter{position:relative;z-index:2;color:var(--cream);font:190px/.9 'Playfair Display',serif;text-shadow:0 0 50px rgba(228,196,156,.2)}
-.portfolio-art-detail{position:absolute;bottom:27px;left:30px;color:var(--gold-light);font-size:8px;letter-spacing:4px}
-.portfolio-art-coordinate{position:absolute;top:28px;right:30px;color:rgba(244,232,218,.5);font-size:8px;letter-spacing:2px}
-.portfolio-art-cross{position:absolute;width:1px;height:110%;background:rgba(228,196,156,.13);transform:rotate(45deg)}
-.cross-a{left:25%}
-.cross-b{right:25%;transform:rotate(-45deg)}
-.portfolio-display-bottom{display:flex;justify-content:space-between;align-items:center;gap:25px;padding-top:27px}
-.portfolio-status{display:flex;align-items:center;gap:9px;color:#947C6D;font-size:8px;letter-spacing:2px}
-.portfolio-status i{width:6px;height:6px;border-radius:50%;background:var(--gold)}
-.portfolio-display-bottom h3{color:var(--wine);font:36px 'Playfair Display',serif;margin:12px 0 8px}
-.portfolio-display-bottom p{color:var(--muted);font-size:10px;line-height:1.9;max-width:350px;margin:0}
-.portfolio-open{flex:0 0 44px;width:44px;height:44px;display:grid;place-items:center;border:1px solid rgba(81,35,45,.3);border-radius:50%;color:var(--wine);transition:background .4s,color .4s,transform .5s}
-a.portfolio-open:hover{background:var(--wine);color:var(--cream);transform:rotate(45deg)}
-.portfolio-open-static{opacity:.45}
-.portfolio-footnote{display:flex;justify-content:space-between;border-top:1px solid rgba(81,35,45,.16);padding-top:20px;margin-top:80px;color:#A18C80;font-size:8px;letter-spacing:2px}
-
-/* founder */
-.founder{position:relative;overflow:hidden;padding:125px 12% 45px;color:var(--cream);background:radial-gradient(ellipse at 85% 55%,rgba(113,56,68,.35),transparent 43%),var(--wine-deep)}
-.founder-background-mark{position:absolute;right:-30px;top:20px;color:rgba(228,196,156,.035);font:620px/.9 'Playfair Display',serif;pointer-events:none}
-.founder-top{position:relative;display:flex;justify-content:space-between;gap:20px}
-.founder-top>span{color:rgba(244,232,218,.38);font-size:8px;letter-spacing:2px}
-.founder-heading{position:relative;margin-top:65px}
-.founder-heading h2{font:500 clamp(54px,7vw,90px)/1.1 'Playfair Display',serif;letter-spacing:-2px;margin:0}
-.founder-heading em{color:var(--rose);font-weight:400}
-.founder-profile{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;max-width:800px;margin:90px 0 75px}
-.founder-monogram{width:175px;height:175px;border:1px solid var(--gold);border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#633641,#28171D 75%);box-shadow:0 0 70px rgba(199,164,123,.08)}
-.founder-monogram:before,.founder-monogram:after{content:"";position:absolute;border:1px solid rgba(199,164,123,.3);border-radius:50%;inset:10px}
-.founder-monogram:after{inset:-12px;border-style:dashed;animation:spin 40s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.founder-monogram>span{color:var(--gold-light);font:120px 'Playfair Display',serif}
-.founder-monogram small{position:absolute;bottom:35px;color:var(--gold-light);font-size:7px;letter-spacing:3px}
-.founder-information{max-width:390px}
-.founder-label{color:var(--gold);font-size:8px;letter-spacing:3px}
-.founder-information h3{font:36px 'Playfair Display',serif;margin:15px 0}
-.founder-line{height:1px;background:var(--gold);margin:20px 0}
-.founder-information p{color:rgba(244,232,218,.65);font-size:11px;line-height:2.1}
-.founder-bottom{position:relative;border-top:1px solid rgba(228,196,156,.2);padding-top:22px;display:flex;gap:50px;color:var(--gold);font-size:8px;letter-spacing:2px}
-
-/* family */
-.family{padding:120px 12% 75px;background:var(--cream)}
-.family-heading{display:grid;grid-template-columns:1.2fr .8fr;align-items:end;gap:50px}
-.family-heading h2{margin-top:35px}
-.family-heading>div:last-child p{max-width:310px;color:var(--muted);font-size:11px;line-height:2.1;margin:0 0 8px}
-.family-visual{max-width:650px;margin:90px auto 55px;display:flex;flex-direction:column;align-items:center}
-.family-person{min-width:235px;padding:21px 18px;border-bottom:1px solid var(--gold);display:flex;flex-direction:column;align-items:center;gap:11px;text-align:center}
-.family-person>span{color:#A58B7E;font-size:8px;letter-spacing:3px}
-.family-person strong{color:var(--wine);font:23px 'Playfair Display',serif}
-.family-stem{width:1px;height:50px;background:var(--gold);transform-origin:top}
-.family-horizontal{width:245px;height:1px;background:var(--gold)}
-.family-sons{display:grid;grid-template-columns:1fr 1fr;gap:65px;position:relative;width:min(100%,530px)}
-.family-sons:before,.family-sons:after{content:"";position:absolute;top:-25px;width:1px;height:25px;background:var(--gold)}
-.family-sons:before{left:calc(50% - 32px)}
-.family-sons:after{left:calc(50% + 32px)}
-.family-vedant{background:rgba(201,155,145,.1)}
-.family-caption{border-top:1px solid rgba(81,35,45,.16);padding-top:20px;display:flex;justify-content:space-between;color:#A18C80;font-size:8px;letter-spacing:2px}
-
-/* contact */
-.contact{position:relative;overflow:hidden;min-height:580px;padding:125px 12%;color:var(--cream);background:radial-gradient(ellipse at 85% 50%,rgba(113,56,68,.35),transparent 43%),var(--wine)}
-.contact-content{position:relative;z-index:2}
-.contact h2{margin:45px 0 22px;font:500 clamp(55px,7vw,91px)/1.1 'Playfair Display',serif;letter-spacing:-2px}
-.contact h2 em{color:var(--rose);font-weight:400}
-.contact-content p{max-width:400px;color:rgba(244,232,218,.65);font-size:11px;line-height:2}
-.contact-link{display:inline-flex;align-items:center;gap:25px;margin-top:28px;padding-bottom:13px;border-bottom:1px solid var(--gold);color:var(--gold-light);font-size:9px;letter-spacing:2px;transition:gap .4s}
-.contact-link:hover{gap:37px}
-.contact-link span{display:grid;place-items:center}
-.contact-content small{display:block;margin-top:24px;color:rgba(244,232,218,.35);font-size:9px}
-.contact-decoration{position:absolute;width:430px;height:430px;right:2%;top:50%;margin-top:-215px;opacity:.14;animation:spin 120s linear infinite}
-
-@media(max-width:900px){
-.hero{padding-left:7%;padding-right:7%}
-.hero-content{width:62%}
-.hero-symbol-wrap{right:-9%;width:50%;opacity:.8}
-.hero h1{font-size:112px}
-.group-story,.philosophy,.portfolio,.founder,.family,.contact{padding-left:8%;padding-right:8%}
-.portfolio-layout{gap:35px}
+:root {
+  --orange: #E96A24;
+  --orange-dark: #C94B12;
+  --orange-mid: #F28A42;
+  --orange-light: #F8B078;
+  --peach: #FCE6D5;
+  --ivory: #FFF9F3;
+  --cream: #F7EFE6;
+  --ink: #783311;
+  --muted: #98684E;
+  --white: #FFFFFF;
 }
 
-@media(max-width:650px){
-html{scroll-padding-top:70px}
-.site-nav{height:70px;padding:0 20px}
-.nav-menu-button{display:block}
-.nav-cta{margin-left:auto;margin-right:18px;font-size:8px}
-.nav-links{display:none;position:absolute;top:70px;left:0;right:0;flex-direction:column;gap:0;padding:15px 25px 22px;background:var(--cream);border-bottom:1px solid rgba(81,35,45,.15)}
-.nav-links-open{display:flex}
-.nav-links a{padding:15px 0;border-bottom:1px solid rgba(81,35,45,.1)}
-.nav-links a i{display:none}
-.hero{min-height:820px;padding:82px 25px 60px;align-items:flex-start}
-.hero-content{width:100%}
-.hero-kicker{font-size:7px;letter-spacing:2px}
-.hero h1{font-size:clamp(77px,19vw,108px);letter-spacing:-5px;margin-top:38px}
-.hero-tagline{font-size:25px}
-.hero-description{max-width:320px;font-size:11px}
-.hero-symbol-wrap{width:85%;right:-4%;top:auto;bottom:0;margin-top:0;opacity:.72}
-.hero-symbol-core{width:42%;padding:13px}
-.hero-bottom,.hero-side-index{display:none}
-.marquee-track span{font-size:16px}
-.group-story,.philosophy,.portfolio,.founder,.family,.contact{padding-left:25px;padding-right:25px}
-.group-story{padding-top:85px;padding-bottom:65px;min-height:auto}
-.story-main{margin-top:70px;gap:18px}
-.story-number{font-size:17px}
-.story-main h2,.portfolio-heading h2,.family-heading h2{font-size:49px;letter-spacing:-1.5px}
-.story-description-row{grid-template-columns:25px 1fr;gap:18px;margin-top:45px;margin-bottom:55px}
-.story-large-copy{font-size:22px}
-.story-small-copy{font-size:10px}
-.story-decoration{font-size:200px;bottom:-70px}
-.philosophy{padding-top:85px;padding-bottom:85px}
-.philosophy h2{font-size:42px;margin:45px 0}
-.philosophy-bottom{flex-direction:column;gap:20px}
-.philosophy-orbit{width:270px;height:270px;right:-170px;top:120px}
-.philosophy-orbit span{font-size:140px}
-.portfolio{padding-top:85px;padding-bottom:60px}
-.portfolio-heading,.family-heading{display:block}
-.portfolio-heading h2{margin-top:30px}
-.portfolio-heading>div:last-child p,.family-heading>div:last-child p{margin-top:24px}
-.portfolio-layout{display:flex;flex-direction:column;align-items:stretch;gap:45px;margin-top:55px}
-.portfolio-tab{font-size:19px;padding:19px 0}
-.portfolio-art{aspect-ratio:1.12}
-.portfolio-art-letter{font-size:145px}
-.portfolio-display-bottom h3{font-size:30px}
-.portfolio-display-bottom p{max-width:250px}
-.portfolio-footnote{margin-top:55px}
-.founder{padding-top:85px;padding-bottom:35px}
-.founder-top>span{max-width:120px;text-align:right;line-height:1.7}
-.founder-heading{margin-top:50px}
-.founder-heading h2,.contact h2{font-size:52px}
-.founder-profile{grid-template-columns:1fr;gap:45px;margin:65px 0}
-.founder-monogram{width:135px;height:135px}
-.founder-monogram>span{font-size:95px}
-.founder-bottom{flex-wrap:wrap;gap:17px 25px;font-size:7px}
-.founder-background-mark{font-size:300px;right:-90px}
-.family{padding-top:85px;padding-bottom:60px}
-.family-visual{margin-top:60px}
-.family-person{min-width:0;width:100%;padding:18px 5px}
-.family-person strong{font-size:18px}
-.family-sons{gap:13px}
-.family-horizontal{width:53%}
-.family-caption{font-size:7px;gap:10px}
-.contact{min-height:520px;padding-top:90px;padding-bottom:90px}
-.contact-decoration{width:250px;height:250px;margin-top:0;right:-130px;top:75%}
+* {
+  box-sizing: border-box;
 }
 
-@media(prefers-reduced-motion:reduce){
-html{scroll-behavior:auto}
-.ghuge-site *,.ghuge-site *:before,.ghuge-site *:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
+}
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+  background: var(--ivory);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font: inherit;
+}
+
+.ghuge-home {
+  width: 100%;
+  overflow: hidden;
+  background: var(--ivory);
+}
+
+.section {
+  position: relative;
+  padding: 125px 7%;
+}
+
+.section-container {
+  max-width: 1380px;
+  margin: 0 auto;
+}
+
+/* SCROLL PROGRESS */
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 200;
+  transform-origin: 0%;
+  background: linear-gradient(90deg, #C94B12, #F8B078);
+}
+
+/* NAVIGATION */
+
+.navbar {
+  height: 86px;
+  padding: 0 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,249,243,.96);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid rgba(201,75,18,.12);
+  backdrop-filter: blur(18px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.brand-symbol {
+  width: 43px;
+  height: 43px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: white;
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  background: linear-gradient(135deg, #C94B12, #F8B078);
+  box-shadow: 0 7px 18px rgba(201,75,18,.16);
+}
+
+.brand-name {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.brand-name small {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 5px;
+  margin-top: 4px;
+  font-weight: 500;
+  color: var(--orange);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.nav-links a {
+  font-size: 12px;
+  font-weight: 600;
+  color: #98684E;
+  transition: color .3s ease;
+}
+
+.nav-links a:hover {
+  color: var(--orange);
+}
+
+.nav-cta {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 3px;
+  background: linear-gradient(110deg, #C94B12, #F28A42);
+  transition: transform .3s, box-shadow .3s;
+}
+
+.nav-cta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(201,75,18,.2);
+}
+
+.nav-mobile-contact,
+.menu-toggle {
+  display: none;
+}
+
+/* HERO */
+
+.hero {
+  min-height: 740px;
+  height: min(830px, calc(100vh - 86px));
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  color: white;
+  background:
+    radial-gradient(ellipse at 77% 45%, rgba(255,230,207,.4), transparent 38%),
+    linear-gradient(115deg, #C94B12 0%, #E96A24 48%, #F28A42 78%, #F8B078 100%);
+}
+
+.hero-grid-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: .11;
+  background-image:
+    linear-gradient(rgba(255,255,255,.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.25) 1px, transparent 1px);
+  background-size: 75px 75px;
+  mask-image: linear-gradient(90deg, transparent, black 45%, black);
+  pointer-events: none;
+}
+
+.hero-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-glow-one {
+  width: 480px;
+  height: 480px;
+  right: 7%;
+  top: 4%;
+  background: radial-gradient(circle, rgba(255,237,219,.3), transparent 70%);
+}
+
+.hero-glow-two {
+  width: 380px;
+  height: 380px;
+  left: -12%;
+  bottom: -20%;
+  background: radial-gradient(circle, rgba(255,195,135,.25), transparent 70%);
+}
+
+.hero-inner {
+  width: 100%;
+  max-width: 1380px;
+  margin: auto;
+  padding: 30px 7%;
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  align-items: center;
+  gap: 45px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-content {
+  max-width: 680px;
+}
+
+.hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  margin-bottom: 35px;
+}
+
+.eyebrow-dot {
+  width: 7px;
+  height: 7px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 0 5px rgba(255,255,255,.18);
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(55px, 6.6vw, 91px);
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -3px;
+}
+
+.hero h1 em {
+  font-weight: 500;
+  color: #FFE5CB;
+}
+
+.hero-description {
+  max-width: 460px;
+  font-size: 14px;
+  line-height: 1.95;
+  color: rgba(255,255,255,.9);
+  margin: 30px 0 34px;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 27px;
+}
+
+.hero-button {
+  padding: 17px 23px;
+  display: inline-flex;
+  align-items: center;
+  gap: 20px;
+  background: white;
+  color: var(--orange-dark);
+  font-size: 12px;
+  font-weight: 700;
+  transition: transform .3s, box-shadow .3s;
+}
+
+.hero-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 25px rgba(120,49,17,.16);
+}
+
+.hero-text-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.hero-text-link svg {
+  transition: transform .3s;
+}
+
+.hero-text-link:hover svg {
+  transform: translateX(5px);
+}
+
+.hero-trust-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 55px;
+  color: rgba(255,255,255,.72);
+  font-size: 8px;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.trust-line {
+  width: 35px;
+  height: 1px;
+  background: rgba(255,255,255,.8);
+}
+
+/* HERO EMBLEM */
+
+.hero-visual {
+  min-height: 500px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.visual-top-label {
+  position: absolute;
+  top: 28px;
+  right: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 5px;
+  color: rgba(255,255,255,.72);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.emblem-stage {
+  width: 500px;
+  height: 500px;
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.emblem-orbit {
+  position: absolute;
+  border: 1px solid rgba(255,255,255,.36);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.orbit-one {
+  width: 330px;
+  height: 330px;
+}
+
+.orbit-two {
+  width: 410px;
+  height: 410px;
+  transform: rotate(35deg) scaleY(.75);
+  border-style: dashed;
+  border-color: rgba(255,255,255,.32);
+}
+
+.orbit-three {
+  width: 475px;
+  height: 475px;
+  border-color: rgba(255,255,255,.16);
+}
+
+.emblem-orbit-dot {
+  position: absolute;
+  width: 410px;
+  height: 410px;
+  border-radius: 50%;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.emblem-orbit-dot span {
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  width: 11px;
+  height: 11px;
+  background: #FFF4E9;
+  border-radius: 50%;
+  box-shadow: 0 0 18px white;
+}
+
+.hero-emblem {
+  width: 235px;
+  height: 235px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  position: relative;
+  z-index: 3;
+  background: linear-gradient(145deg, #FFE8D2, #F8B078 48%, #E96A24);
+  box-shadow:
+    0 35px 90px rgba(120,49,17,.2),
+    inset 0 4px 18px rgba(255,255,255,.7);
+}
+
+.emblem-inner {
+  width: 193px;
+  height: 193px;
+  border: 1px solid rgba(255,255,255,.8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: linear-gradient(140deg, #F28A42, #C94B12);
+  box-shadow: inset 0 0 30px rgba(255,255,255,.18);
+}
+
+.emblem-inner > span {
+  font-family: 'Playfair Display', serif;
+  font-size: 116px;
+  line-height: .9;
+  color: white;
+  text-shadow: 0 8px 20px rgba(120,49,17,.17);
+}
+
+.emblem-divider {
+  width: 38px;
+  height: 1px;
+  background: rgba(255,255,255,.8);
+  margin-top: 7px;
+}
+
+.emblem-inner small {
+  font-size: 8px;
+  letter-spacing: 4px;
+  color: white;
+  margin-top: 9px;
+}
+
+.visual-bottom-label {
+  position: absolute;
+  bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,.85);
+}
+
+.visual-bottom-line {
+  height: 1px;
+  width: 32px;
+  background: white;
+}
+
+.visual-side-note {
+  position: absolute;
+  right: -4px;
+  bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,.65);
+}
+
+.visual-side-note span:first-child {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px;
+  color: white;
+}
+
+.hero-bottom {
+  position: absolute;
+  bottom: 27px;
+  left: 7%;
+  right: 7%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,.83);
+  z-index: 3;
+}
+
+.hero-bottom a {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.scroll-arrow {
+  font-size: 16px;
+}
+
+/* MARQUEE */
+
+.marquee {
+  overflow: hidden;
+  padding: 24px 0;
+  background: linear-gradient(100deg, #C94B12, #F28A42, #E96A24);
+  color: white;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marqueeMove 32s linear infinite;
+}
+
+.marquee-content {
+  display: flex;
+  align-items: center;
+  gap: 52px;
+  padding-right: 52px;
+  white-space: nowrap;
+}
+
+.marquee-content span {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px;
+  letter-spacing: 3px;
+}
+
+.marquee-content b {
+  font-size: 17px;
+  color: #FFE5CB;
+}
+
+@keyframes marqueeMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* STORY */
+
+.group-story {
+  background: var(--ivory);
+}
+
+.story-grid {
+  display: grid;
+  grid-template-columns: .65fr 1.45fr .7fr;
+  gap: 45px;
+  align-items: start;
+}
+
+.section-kicker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--orange-dark);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.section-kicker > span {
+  width: 27px;
+  height: 1px;
+  background: var(--orange);
+}
+
+.story-index {
+  display: block;
+  margin-top: 22px;
+  color: #BA876A;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+.story-main h2,
+.portfolio-top h2,
+.founder-content h2,
+.contact h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(42px, 4.8vw, 66px);
+  font-weight: 500;
+  line-height: 1.13;
+  letter-spacing: -1.5px;
+  margin: 0;
+}
+
+.story-main h2 em,
+.portfolio-top h2 em {
+  color: var(--orange);
+  font-weight: 500;
+}
+
+.story-lead {
+  max-width: 610px;
+  margin: 32px 0 17px;
+  color: #814323;
+  font-size: 17px;
+  line-height: 1.8;
+  font-weight: 500;
+}
+
+.story-copy {
+  max-width: 580px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 2;
+}
+
+.underlined-link {
+  display: inline-flex;
+  gap: 15px;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--orange);
+  margin-top: 20px;
+  color: var(--orange-dark);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.story-decoration {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.story-mark {
+  font-family: 'Playfair Display', serif;
+  font-size: 185px;
+  line-height: 1;
+  color: #F4B17F;
+  opacity: .7;
+}
+
+.story-decoration-caption {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  color: var(--orange);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+/* PRINCIPLES */
+
+.principles {
+  padding: 75px 7%;
+  background: #F8EFE6;
+  border-top: 1px solid #F1DDCD;
+  border-bottom: 1px solid #F1DDCD;
+}
+
+.principles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 55px;
+}
+
+.principle-item {
+  position: relative;
+  padding: 12px 28px 12px 0;
+}
+
+.principle-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: -27px;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  background: #E8CEB9;
+}
+
+.principle-number {
+  color: #C28A68;
+  font-size: 9px;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+
+.principle-icon {
+  margin-top: 23px;
+  color: var(--orange);
+}
+
+.principle-item h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 25px;
+  font-weight: 500;
+  margin: 14px 0 8px;
+  color: var(--ink);
+}
+
+.principle-item p {
+  max-width: 290px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+/* PHILOSOPHY */
+
+.philosophy {
+  color: white;
+  overflow: hidden;
+  background: linear-gradient(115deg, #C94B12 0%, #E96A24 50%, #F28A42 100%);
+}
+
+.philosophy-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  right: -120px;
+  top: -220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,239,219,.28), transparent 68%);
+}
+
+.philosophy-outline {
+  position: absolute;
+  width: 470px;
+  height: 470px;
+  right: -100px;
+  bottom: -260px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 45px rgba(255,255,255,.025),
+              0 0 0 90px rgba(255,255,255,.02);
+}
+
+.philosophy-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.light-kicker {
+  color: rgba(255,255,255,.9);
+}
+
+.light-kicker > span {
+  background: white;
+}
+
+.philosophy h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(65px, 8.5vw, 112px);
+  font-weight: 500;
+  line-height: 1.03;
+  letter-spacing: -3px;
+  margin: 60px 0 50px;
+}
+
+.philosophy h2 em,
+.founder-content h2 em,
+.contact h2 em {
+  color: #FFE5CB;
+  font-weight: 500;
+}
+
+.philosophy-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 30px;
+}
+
+.philosophy-bottom p {
+  max-width: 490px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 2;
+  color: rgba(255,255,255,.9);
+}
+
+.philosophy-symbol {
+  width: 70px;
+  height: 70px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.55);
+  border-radius: 50%;
+  color: white;
+}
+
+.philosophy-index {
+  margin-top: 65px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,.25);
+  color: rgba(255,255,255,.7);
+  font-size: 8px;
+  letter-spacing: 2px;
+}
+
+.philosophy-index span {
+  margin: 0 10px;
+  color: white;
+}
+
+/* PORTFOLIO */
+
+.portfolio {
+  background: #FFF9F3;
+}
+
+.portfolio-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 40px;
+  margin-bottom: 65px;
+}
+
+.portfolio-top h2 {
+  margin-top: 25px;
+}
+
+.portfolio-intro {
+  max-width: 340px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 2;
+  margin-bottom: 5px;
+}
+
+.business-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.business-reveal {
+  height: 100%;
+}
+
+.business-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 490px;
+  height: 100%;
+  padding: 24px;
+  background: #F8EFE6;
+  border: 1px solid #F2D9C7;
+  transition: box-shadow .4s, border-color .4s;
+}
+
+.business-card:hover {
+  box-shadow: 0 25px 60px rgba(201,75,18,.12);
+  border-color: #E9A477;
+}
+
+.business-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #B27B5B;
+}
+
+.business-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  letter-spacing: .5px;
+  color: var(--orange-dark);
+  white-space: nowrap;
+}
+
+.business-status i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #E96A24;
+}
+
+.business-card.sports .business-status i {
+  background: #D9954D;
+}
+
+.business-art {
+  height: 220px;
+  margin: 25px 0;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #F9C79F, #F28A42);
+}
+
+.business-card.uplyft .business-art {
+  background: linear-gradient(135deg, #F7B77E, #E96A24);
+}
+
+.business-card.sports .business-art {
+  background: linear-gradient(135deg, #FFE0C3, #ED9555);
+}
+
+.business-art-ring {
+  position: absolute;
+  border: 1px solid rgba(255,255,255,.55);
+  border-radius: 50%;
+  transition: transform .8s ease;
+}
+
+.ring-one {
+  width: 175px;
+  height: 175px;
+}
+
+.ring-two {
+  width: 220px;
+  height: 220px;
+  border-style: dashed;
+  opacity: .65;
+}
+
+.business-card:hover .ring-one {
+  transform: scale(1.16) rotate(25deg);
+}
+
+.business-card:hover .ring-two {
+  transform: scale(.92) rotate(-18deg);
+}
+
+.business-art-icon {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: rgba(255,255,255,.8);
+}
+
+.business-art-letter {
+  position: relative;
+  z-index: 1;
+  font-family: 'Playfair Display', serif;
+  font-size: 125px;
+  color: white;
+  text-shadow: 0 10px 25px rgba(120,49,17,.14);
+}
+
+.business-art-spark {
+  position: absolute;
+  right: 25px;
+  top: 25px;
+  font-size: 25px;
+  color: white;
+}
+
+.business-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 15px;
+  flex: 1;
+}
+
+.business-category {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--orange-dark);
+  font-weight: 700;
+}
+
+.business-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 500;
+  margin: 10px 0;
+  color: var(--ink);
+}
+
+.business-card p {
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--muted);
+  max-width: 280px;
+  margin: 0;
+}
+
+.business-arrow {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: white;
+  color: var(--orange);
+  transition: transform .3s, background .3s, color .3s;
+}
+
+.business-card:hover .business-arrow {
+  transform: rotate(45deg);
+  background: var(--orange);
+  color: white;
+}
+
+.business-arrow-static {
+  opacity: .7;
+}
+
+.portfolio-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-top: 1px solid #EED8C7;
+  margin-top: 45px;
+  padding-top: 25px;
+}
+
+.portfolio-note span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--orange);
+}
+
+.portfolio-note p {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.portfolio-note svg {
+  color: var(--orange);
+}
+
+/* LEADERSHIP */
+
+.founder {
+  color: white;
+  overflow: hidden;
+  background: linear-gradient(120deg, #C94B12, #E96A24 55%, #F5A064);
+}
+
+.founder-decoration {
+  position: absolute;
+  right: -150px;
+  top: -160px;
+  width: 620px;
+  height: 620px;
+  pointer-events: none;
+}
+
+.founder-circle {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 50%;
+}
+
+.founder-circle-two {
+  inset: 65px;
+  border-style: dashed;
+}
+
+.founder-circle-three {
+  inset: 130px;
+  border-color: rgba(255,255,255,.15);
+}
+
+.founder-grid {
+  display: grid;
+  grid-template-columns: .85fr 1.15fr;
+  align-items: center;
+  gap: 100px;
+  position: relative;
+  z-index: 2;
+}
+
+.founder-visual {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.founder-monogram {
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  padding: 13px;
+  background: linear-gradient(145deg, #FFE5CB, #F8B078 48%, #C94B12);
+  box-shadow: 0 30px 70px rgba(120,49,17,.15);
+}
+
+.founder-monogram-inner {
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(255,255,255,.65);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: linear-gradient(145deg, #F28A42, #C94B12);
+}
+
+.founder-monogram span {
+  font-family: 'Playfair Display', serif;
+  font-size: 175px;
+  line-height: 1;
+  color: white;
+}
+
+.founder-monogram-line {
+  width: 75px;
+  height: 1px;
+  background: white;
+  margin: 8px 0;
+}
+
+.founder-monogram small {
+  font-size: 9px;
+  letter-spacing: 4px;
+}
+
+.founder-visual-caption {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,.8);
+}
+
+.founder-content h2 {
+  margin: 35px 0 25px;
+}
+
+.founder-content p {
+  max-width: 490px;
+  color: rgba(255,255,255,.9);
+  font-size: 13px;
+  line-height: 2.1;
+}
+
+.founder-divider {
+  width: 65px;
+  height: 1px;
+  background: white;
+  margin: 35px 0 20px;
+}
+
+.founder-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  color: #FFE5CB;
+  font-size: 12px;
+  font-weight: 700;
+  padding-bottom: 9px;
+  border-bottom: 1px solid rgba(255,255,255,.65);
+  transition: gap .3s ease;
+}
+
+.founder-link:hover {
+  gap: 20px;
+}
+
+/* CONTACT */
+
+.contact {
+  background: linear-gradient(115deg, #E96A24, #F28A42 55%, #F8B078);
+  color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+.contact-orb {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.contact-orb-one {
+  width: 550px;
+  height: 550px;
+  box-shadow:
+    0 0 0 50px rgba(255,255,255,.035),
+    0 0 0 100px rgba(255,255,255,.025);
+}
+
+.contact-orb-two {
+  width: 700px;
+  height: 700px;
+  border-color: rgba(255,255,255,.1);
+}
+
+.contact-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.contact .section-kicker {
+  justify-content: center;
+}
+
+.contact h2 {
+  font-size: clamp(58px, 8vw, 100px);
+  margin: 45px 0 25px;
+}
+
+.contact-inner > div > p {
+  max-width: 460px;
+  margin: 0 auto;
+  font-size: 13px;
+  line-height: 2;
+  color: rgba(255,255,255,.9);
+}
+
+.contact-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 25px;
+  padding: 17px 25px;
+  margin-top: 35px;
+  background: white;
+  color: var(--orange-dark);
+  font-size: 12px;
+  font-weight: 700;
+  transition: transform .3s, box-shadow .3s;
+}
+
+.contact-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(120,49,17,.16);
+}
+
+.contact-bottom-note {
+  margin-top: 75px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,.25);
+  color: rgba(255,255,255,.75);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.contact-bottom-note span {
+  padding: 0 10px;
+  color: white;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1050px) {
+  .nav-links {
+    gap: 20px;
+  }
+
+  .hero-inner {
+    gap: 15px;
+  }
+
+  .hero h1 {
+    font-size: 70px;
+  }
+
+  .hero-visual {
+    transform: scale(.86);
+  }
+
+  .story-grid {
+    grid-template-columns: .5fr 1.5fr;
+  }
+
+  .story-decoration {
+    display: none;
+  }
+
+  .founder-grid {
+    gap: 50px;
+  }
+
+  .founder-monogram {
+    width: 270px;
+    height: 270px;
+  }
+
+  .founder-monogram span {
+    font-size: 150px;
+  }
+
+  .business-grid {
+    gap: 14px;
+  }
+
+  .business-card {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 760px) {
+  .section {
+    padding: 85px 7%;
+  }
+
+  .navbar {
+    height: 75px;
+    padding: 0 6%;
+  }
+
+  .nav-cta {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: grid;
+    place-items: center;
+    background: transparent;
+    border: none;
+    color: var(--orange-dark);
+    cursor: pointer;
+    padding: 8px;
+  }
+
+  .nav-links {
+    position: fixed;
+    inset: 75px 0 0;
+    background: #FFF9F3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    transform: translateX(100%);
+    transition: transform .4s ease;
+  }
+
+  .nav-links.nav-open {
+    transform: translateX(0);
+  }
+
+  .nav-links a {
+    font-family: 'Playfair Display', serif;
+    font-size: 25px;
+    color: var(--ink);
+  }
+
+  .nav-mobile-contact {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--orange) !important;
+  }
+
+  .hero {
+    height: auto;
+    min-height: 930px;
+    padding: 75px 0 90px;
+  }
+
+  .hero-inner {
+    grid-template-columns: 1fr;
+    padding: 0 7%;
+    gap: 0;
+  }
+
+  .hero h1 {
+    font-size: clamp(53px, 12vw, 75px);
+    letter-spacing: -2px;
+  }
+
+  .hero-description {
+    font-size: 13px;
+    max-width: 430px;
+  }
+
+  .hero-trust-line {
+    margin-top: 35px;
+    font-size: 7px;
+  }
+
+  .hero-visual {
+    min-height: 370px;
+    transform: scale(.78);
+    margin: -5px 0 -20px;
+  }
+
+  .hero-bottom {
+    bottom: 20px;
+    font-size: 8px;
+    left: 6%;
+    right: 6%;
+  }
+
+  .visual-top-label {
+    right: 0;
+  }
+
+  .visual-side-note {
+    right: 0;
+  }
+
+  .story-grid {
+    grid-template-columns: 1fr;
+    gap: 38px;
+  }
+
+  .story-main h2 {
+    font-size: 47px;
+  }
+
+  .story-lead {
+    font-size: 15px;
+  }
+
+  .principles {
+    padding: 65px 7%;
+  }
+
+  .principles-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .principle-item {
+    padding: 0 0 28px;
+    border-bottom: 1px solid #E8CEB9;
+  }
+
+  .principle-item:not(:last-child)::after {
+    display: none;
+  }
+
+  .principle-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .principle-icon {
+    margin-top: 15px;
+  }
+
+  .philosophy h2 {
+    font-size: 65px;
+    margin: 45px 0;
+  }
+
+  .philosophy-bottom {
+    align-items: start;
+  }
+
+  .philosophy-symbol {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+  }
+
+  .portfolio-top {
+    display: block;
+    margin-bottom: 40px;
+  }
+
+  .portfolio-top h2 {
+    font-size: 48px;
+  }
+
+  .portfolio-intro {
+    margin-top: 25px;
+  }
+
+  .business-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .business-card {
+    min-height: 440px;
+    padding: 22px;
+  }
+
+  .business-art {
+    height: 205px;
+  }
+
+  .portfolio-note {
+    align-items: start;
+  }
+
+  .portfolio-note svg {
+    flex-shrink: 0;
+  }
+
+  .founder-grid {
+    grid-template-columns: 1fr;
+    gap: 55px;
+  }
+
+  .founder-monogram {
+    width: 250px;
+    height: 250px;
+  }
+
+  .founder-monogram span {
+    font-size: 140px;
+  }
+
+  .founder-content h2 {
+    font-size: 48px;
+  }
+
+  .contact h2 {
+    font-size: 59px;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero {
+    min-height: 870px;
+  }
+
+  .hero-eyebrow {
+    font-size: 8px;
+    letter-spacing: 2px;
+  }
+
+  .hero-visual {
+    transform: scale(.65);
+    margin-left: -25px;
+    margin-right: -25px;
+  }
+
+  .hero-actions {
+    gap: 18px;
+  }
+
+  .hero-button {
+    padding: 15px 17px;
+  }
+
+  .hero-bottom {
+    letter-spacing: 1px;
+  }
+
+  .philosophy h2 {
+    font-size: 55px;
+  }
+
+  .story-main h2 {
+    font-size: 41px;
+  }
+
+  .contact h2 {
+    font-size: 49px;
+  }
+
+  .portfolio-note p {
+    font-size: 10px;
+  }
+
+  .business-card-top {
+    font-size: 7px;
+  }
+}
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
 }
 `;

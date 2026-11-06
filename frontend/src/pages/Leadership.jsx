@@ -4,39 +4,49 @@ import { motion } from "framer-motion";
 import {
   ArrowDown,
   ArrowUpRight,
-  Crown,
-  Network,
-  Compass,
-  Building2,
-  MoveUpRight,
+  Flag,
+  Heart,
+  Sparkles,
+  Trophy,
 } from "lucide-react";
 
 const ease = [0.22, 1, 0.36, 1];
 
 const reveal = {
-  hidden: { opacity: 0, y: 35 },
+  hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.85, ease },
+    transition: { duration: 0.9, ease },
   },
 };
 
 const stagger = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.16 },
+    transition: {
+      staggerChildren: 0.18,
+      delayChildren: 0.1,
+    },
   },
 };
 
-function Reveal({ children, className = "" }) {
+function Reveal({ children, className = "", delay = 0 }) {
   return (
     <motion.div
       className={className}
-      variants={reveal}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.18 }}
+      initial={{ opacity: 0, y: 45 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{
+        once: true,
+        amount: 0.08,
+        margin: "0px 0px -30px 0px",
+      }}
+      transition={{
+        duration: 0.95,
+        delay,
+        ease,
+      }}
     >
       {children}
     </motion.div>
@@ -46,61 +56,124 @@ function Reveal({ children, className = "" }) {
 const leaders = [
   {
     id: "01",
-    name: "Somnath Ghuge",
-    role: "THE FOUNDATION",
-    title: "Father · Family Foundation",
-    description:
-      "The foundation of the Ghuge family story. His place at the roots of the family represents the values, support and foundation from which the next generation moves forward.",
-    initials: "SG",
-    style: "father",
+    name: "Harshal Ghuge",
+    role: "THE ELDER SON",
+    title: "Roll Ball Athlete · Entrepreneur",
+    image: "/images/harshal_rollball.jpeg",
+    description: (
+      <>
+        Harshal's journey began on the Roll Ball court, where
+        discipline, determination and teamwork became part of his
+        everyday life.{" "}
+        <strong>Representing India at the international level</strong>{" "}
+        shaped his perspective and strengthened his ability to face
+        challenges.
+        <br />
+        <br />
+        Today, he carries the same commitment into his entrepreneurial
+        journey, believing that{" "}
+        <strong>
+          consistency, perseverance and the courage to take on challenges
+        </strong>{" "}
+        are essential to building something meaningful.
+      </>
+    ),
+    qualities: ["Discipline", "Determination", "Perseverance"],
   },
   {
     id: "02",
-    name: "Harshal Ghuge",
-    role: "THE NEXT GENERATION",
-    title: "Elder Son · Entrepreneur",
-    description:
-      "An entrepreneur representing the next generation of the Ghuge family, contributing to its continuing journey of ambition, enterprise and growth.",
-    initials: "HG",
-    style: "harshal",
-  },
-  {
-    id: "03",
     name: "Vedant Ghuge",
-    role: "THE VISION",
-    title: "Youngest Son · Founder & Entrepreneur",
-    description:
-      "The founder of GHUGE GROUP, driven by the ambition to build a recognised group with multiple businesses, explore new industries and create something that grows beyond one venture.",
-    initials: "VG",
-    style: "vedant",
+    role: "THE YOUNGEST SON",
+    title: "Founder · GHUGE GROUP",
+    image: "/images/ved-founder.jpeg",
+    description: (
+      <>
+        Vedant's journey brings together sport, ambition and
+        entrepreneurship. His experience in Roll Ball and{" "}
+        <strong>representing India at the international level</strong>{" "}
+        helped shape his mindset and approach towards challenges.
+        <br />
+        <br />
+        As the Founder of GHUGE GROUP, he aims to{" "}
+        <strong>
+          bring businesses, ideas and opportunities together under one
+          identity
+        </strong>
+        , building ventures with purpose and a long-term vision.
+      </>
+    ),
+    qualities: ["Vision", "Initiative", "Growth"],
   },
 ];
 
-function LeaderCard({ leader, index }) {
+function FamilyNode({
+  name,
+  role,
+  initials,
+  image,
+  className = "",
+}) {
+  return (
+    <motion.div
+      className={`family-node ${className}`}
+      variants={reveal}
+      whileHover={{ y: -8, scale: 1.025 }}
+      transition={{ duration: 0.4, ease }}
+    >
+      <div className="family-node-image">
+        {image ? (
+          <img src={image} alt={name} />
+        ) : (
+          <span>{initials}</span>
+        )}
+      </div>
+
+      <span className="family-node-role">{role}</span>
+      <h3>{name}</h3>
+      <span className="family-node-bottom">GHUGE FAMILY</span>
+    </motion.div>
+  );
+}
+
+function LeaderCard({ leader }) {
   return (
     <motion.article
-      className={`leader-card ${leader.style}`}
+      className="leader-card"
       variants={reveal}
-      whileHover={{ y: -8 }}
+      whileHover={{ y: -9 }}
       transition={{ duration: 0.4, ease }}
     >
       <div className="leader-card-top">
-        <span>{leader.id} / GHUGE FAMILY</span>
-        <span className="leader-card-line" />
+        <span>{leader.id} / GHUGE GROUP</span>
+        <ArrowUpRight size={18} />
       </div>
 
-      <div className="leader-portrait">
-        <div className="portrait-orbit portrait-orbit-one" />
-        <div className="portrait-orbit portrait-orbit-two" />
-        <div className="portrait-initials">{leader.initials}</div>
-        <span className="portrait-caption">GHUGE GROUP</span>
+      <div className="leader-photo-wrap">
+        <img
+          src={leader.image}
+          alt={leader.name}
+          className="leader-photo"
+        />
+
+        <div className="leader-photo-overlay" />
+
+        <span className="leader-photo-caption">
+          THE NEXT GENERATION
+        </span>
       </div>
 
       <div className="leader-info">
         <span className="leader-role">{leader.role}</span>
         <h3>{leader.name}</h3>
         <span className="leader-title">{leader.title}</span>
+
         <p>{leader.description}</p>
+
+        <div className="leader-qualities">
+          {leader.qualities.map((quality) => (
+            <span key={quality}>{quality}</span>
+          ))}
+        </div>
       </div>
     </motion.article>
   );
@@ -112,10 +185,11 @@ export default function Leadership() {
       <style>{styles}</style>
 
       <main className="leadership-page">
-
         {/* HERO */}
         <section className="leadership-hero">
-          <div className="leadership-hero-pattern" />
+          <div className="hero-grain" />
+          <div className="hero-orbit hero-orbit-one" />
+          <div className="hero-orbit hero-orbit-two" />
 
           <div className="leadership-hero-inner">
             <motion.div
@@ -124,25 +198,32 @@ export default function Leadership() {
               animate="visible"
               variants={stagger}
             >
-              <motion.div className="leadership-eyebrow" variants={reveal}>
+              <motion.div
+                className="leadership-eyebrow"
+                variants={reveal}
+              >
                 <span />
                 THE PEOPLE BEHIND THE VISION
               </motion.div>
 
               <motion.h1 variants={reveal}>
-                Rooted in family.
+                Rooted in
                 <br />
-                <em>Driven by vision.</em>
+                <em>family.</em>
+                <br />
+                Driven by
+                <br />
+                ambition.
               </motion.h1>
 
               <motion.p variants={reveal}>
-                Every great journey has a foundation. GHUGE GROUP represents
-                a family story of ambition, entrepreneurship and the vision
-                to build something meaningful for generations to come.
+                Behind GHUGE GROUP is a family journey shaped by
+                encouragement, sporting experiences and the ambition
+                to build something meaningful for the future.
               </motion.p>
 
               <motion.a
-                href="#leadership-story"
+                href="#family-story"
                 className="leadership-scroll"
                 variants={reveal}
               >
@@ -152,58 +233,95 @@ export default function Leadership() {
             </motion.div>
 
             <motion.div
-              className="leadership-hero-art"
-              initial={{ opacity: 0, scale: 0.8, rotate: -8 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              transition={{ duration: 1.2, ease, delay: 0.2 }}
+              className="hero-image-stage"
+              initial={{
+                opacity: 0,
+                scale: 0.9,
+                x: 35,
+                y: 25,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                x: 0,
+                y: 0,
+              }}
+              transition={{
+                duration: 1.3,
+                ease,
+                delay: 0.25,
+              }}
             >
-              <div className="hero-art-ring ring-a" />
-              <div className="hero-art-ring ring-b" />
-              <div className="hero-art-ring ring-c" />
+              <div className="hero-image-frame">
+                <img
+                  src="/images/ved_dad_harshal.jpeg"
+                  alt="The Ghuge family"
+                />
 
-              <div className="hero-art-center">
-                <span>GG</span>
-                <small>GHUGE GROUP</small>
+                <div className="hero-image-shade" />
+
+                <div className="hero-image-label">
+                  <span>THE GHUGE FAMILY</span>
+                  <strong>Where every journey begins.</strong>
+                </div>
               </div>
 
-              <span className="hero-art-label art-label-top">
-                FAMILY
-              </span>
-              <span className="hero-art-label art-label-bottom">
-                LEGACY
-              </span>
+              <motion.div
+                className="hero-floating-card"
+                animate={{ y: [0, -10, 0] }}
+                transition={{
+                  duration: 4.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                <Sparkles size={17} />
+                <span>FAMILY · SPORT · ENTERPRISE</span>
+              </motion.div>
+
+              <div className="hero-image-outline" />
             </motion.div>
           </div>
 
-          <div className="leadership-hero-bottom">
+          <div className="hero-bottom">
             <span>FAMILY</span>
-            <span>ENTREPRENEURSHIP</span>
-            <span>LONG-TERM VISION</span>
+            <span>SPORTING LEGACY</span>
+            <span>LEADERSHIP</span>
+            <span>THE FUTURE</span>
           </div>
         </section>
 
         {/* FAMILY STORY */}
-        <section className="leadership-intro" id="leadership-story">
-          <Reveal>
-            <span className="leadership-kicker">01 / OUR STORY</span>
+        <section className="family-story" id="family-story">
+          <Reveal className="story-heading">
+            <span className="section-kicker">
+              01 / OUR FOUNDATION
+            </span>
+
             <h2>
-              A foundation that
+              More than a business.
               <br />
-              inspires <em>the future.</em>
+              <em>A family story.</em>
             </h2>
           </Reveal>
 
-          <Reveal className="leadership-intro-text">
+          <Reveal className="story-copy" delay={0.15}>
             <p>
-              GHUGE GROUP is built around a vision that goes beyond a single
-              business. At its heart is a family, a shared journey and the
-              ambition to create opportunities across industries.
+              Every growing vision has a foundation. For GHUGE GROUP,
+              that foundation is family.
             </p>
+
             <p>
-              With the foundation of one generation and the entrepreneurial
-              drive of the next, the journey is about building something
-              lasting — a group that can continue to grow and evolve.
+              Somnath and Bhagyashree Ghuge have been a constant source
+              of encouragement and motivation for their sons. From
+              childhood sporting dreams to entrepreneurial ambitions,
+              their support has helped shape the journey.
             </p>
+
+            <div className="story-signature">
+              <Heart size={17} />
+              <span>ROOTED IN FAMILY. BUILT FOR THE FUTURE.</span>
+            </div>
           </Reveal>
         </section>
 
@@ -211,86 +329,80 @@ export default function Leadership() {
         <section className="family-tree-section">
           <div className="family-tree-heading">
             <Reveal>
-              <span className="leadership-kicker">02 / THE GHUGE FAMILY</span>
+              <span className="section-kicker">
+                02 / THE GHUGE FAMILY
+              </span>
+
               <h2>
                 One family.
                 <br />
                 <em>One growing vision.</em>
               </h2>
+
               <p>
-                A family foundation connected to the next generation of
-                entrepreneurship.
+                The people, relationships and values behind the group.
               </p>
             </Reveal>
           </div>
 
-          <div className="family-tree">
-            <div className="tree-root">
-              <motion.div
-                className="tree-node father-node"
-                initial={{ opacity: 0, y: -25 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, ease }}
-              >
-                <span className="tree-node-label">THE FOUNDATION</span>
-                <div className="tree-node-initial">SG</div>
-                <h3>Somnath Ghuge</h3>
-                <p>Father · Family Foundation</p>
-              </motion.div>
+          <motion.div
+            className="family-tree"
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{
+              once: true,
+              amount: 0.05,
+            }}
+          >
+            <div className="parents-row">
+              <FamilyNode
+                name="Somnath Ghuge"
+                role="FATHER · THE FOUNDATION"
+                initials="SG"
+                image="/images/ved_dad.jpeg"
+                className="parent-node"
+              />
+
+              <FamilyNode
+                name="Bhagyashree Ghuge"
+                role="MOTHER · THE STRENGTH"
+                initials="BG"
+                className="parent-node mother-node"
+              />
             </div>
 
             <div className="tree-connector">
-              <motion.div
-                className="tree-vertical-line"
-                initial={{ scaleY: 0 }}
-                whileInView={{ scaleY: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, ease, delay: 0.25 }}
-              />
-              <motion.div
-                className="tree-horizontal-line"
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, ease, delay: 0.65 }}
-              />
+              <span className="tree-vertical-line" />
+              <span className="tree-horizontal-line" />
             </div>
 
-            <motion.div
-              className="tree-children"
-              variants={stagger}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-            >
-              <motion.div className="tree-child" variants={reveal}>
-                <div className="child-connector" />
-                <div className="tree-node child-node">
-                  <span className="tree-node-label">ELDER SON</span>
-                  <div className="tree-node-initial">HG</div>
-                  <h3>Harshal Ghuge</h3>
-                  <p>Entrepreneur</p>
-                  <span className="tree-node-note">
-                    THE NEXT GENERATION
-                  </span>
-                </div>
-              </motion.div>
+            <div className="tree-children">
+              <div className="tree-child">
+                <span className="child-connector" />
 
-              <motion.div className="tree-child" variants={reveal}>
-                <div className="child-connector" />
-                <div className="tree-node child-node vedant-node">
-                  <span className="tree-node-label">YOUNGEST SON</span>
-                  <div className="tree-node-initial">VG</div>
-                  <h3>Vedant Ghuge</h3>
-                  <p>Founder & Entrepreneur</p>
-                  <span className="tree-node-note">
-                    FOUNDER · GHUGE GROUP
-                  </span>
-                </div>
-              </motion.div>
-            </motion.div>
-          </div>
+                <FamilyNode
+                  name="Harshal Ghuge"
+                  role="ELDER SON · ENTREPRENEUR"
+                  initials="HG"
+                  image="/images/harshal_rollball.jpeg"
+                  className="child-node"
+                />
+              </div>
+
+              <div className="tree-child">
+                <span className="child-connector" />
+
+                <FamilyNode
+                  name="Vedant Ghuge"
+                  role="YOUNGEST SON · FOUNDER"
+                  initials="VG"
+                  image="/images/ved-founder.jpeg"
+                  className="child-node vedant-node"
+                />
+              </div>
+            </div>
+          </motion.div>
 
           <div className="tree-caption">
             <span />
@@ -298,16 +410,125 @@ export default function Leadership() {
           </div>
         </section>
 
-        {/* LEADERSHIP PROFILES */}
-        <section className="leadership-profiles">
+        {/* ROLL BALL */}
+        <section className="sports-section">
+          <div className="sports-heading">
+            <Reveal>
+              <span className="section-kicker">
+                03 / THE SPORTING JOURNEY
+              </span>
+
+              <h2>
+                Before the boardroom,
+                <br />
+                <em>there was the court.</em>
+              </h2>
+
+              <p>
+                Two brothers, one sporting passion and a journey that
+                helped shape the people they are today.
+              </p>
+            </Reveal>
+
+            <Reveal className="sports-values" delay={0.15}>
+              <Trophy size={28} />
+              <span>DISCIPLINE</span>
+              <span>TEAMWORK</span>
+              <span>RESILIENCE</span>
+            </Reveal>
+          </div>
+
+          <div className="sports-feature">
+            <motion.div
+              className="sports-image"
+              initial={{
+                opacity: 0,
+                x: -50,
+                scale: 0.96,
+              }}
+              whileInView={{
+                opacity: 1,
+                x: 0,
+                scale: 1,
+              }}
+              viewport={{
+                once: true,
+                amount: 0.08,
+              }}
+              transition={{
+                duration: 1.1,
+                ease,
+              }}
+            >
+              <img
+                src="/images/ved_harshal_rollball.jpeg"
+                alt="Harshal and Vedant during their Roll Ball journey"
+              />
+
+              <span className="sports-image-label">
+                THE ROLL BALL YEARS
+              </span>
+            </motion.div>
+
+            <Reveal className="sports-copy" delay={0.15}>
+              <span className="section-kicker">
+                A SHARED BEGINNING
+              </span>
+
+              <h3>
+                Two journeys.
+                <br />
+                One <em>sporting dream.</em>
+              </h3>
+
+              <p>
+                Roll Ball became an important part of Harshal and
+                Vedant's lives from a young age. Their journey involved
+                years of practice, competition, teamwork and the
+                opportunity to represent India at the international level.
+              </p>
+
+              <p>
+                Sport taught them to stay committed, face challenges
+                and work towards a shared goal. Those lessons continue
+                to influence their approach to life and business.
+              </p>
+
+              <div className="sports-highlight">
+                <Flag size={20} />
+
+                <div>
+                  <strong>Representing India</strong>
+                  <span>
+                    International-level Roll Ball journey
+                  </span>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* INDIVIDUAL PROFILES */}
+        <section
+          className="leadership-profiles"
+          id="next-generation"
+        >
           <div className="profiles-heading">
             <Reveal>
-              <span className="leadership-kicker">03 / THE PEOPLE</span>
+              <span className="section-kicker">
+                04 / THE NEXT GENERATION
+              </span>
+
               <h2>
-                The people behind
+                Two journeys.
                 <br />
-                <em>the journey.</em>
+                <em>One family legacy.</em>
               </h2>
+
+              <p>
+                Different paths, shared values and a common ambition
+                to create something meaningful.
+              </p>
             </Reveal>
           </div>
 
@@ -316,26 +537,33 @@ export default function Leadership() {
             variants={stagger}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.12 }}
+            viewport={{
+              once: true,
+              amount: 0.05,
+            }}
           >
-            {leaders.map((leader, index) => (
+            {leaders.map((leader) => (
               <LeaderCard
                 key={leader.id}
                 leader={leader}
-                index={index}
               />
             ))}
           </motion.div>
         </section>
 
-        {/* VEDANT VISION */}
+        {/* 05 / FOUNDER'S VISION */}
         <section className="vision-section">
           <div className="vision-watermark">VG</div>
 
+          <div className="vision-topline">
+            <span>05 / THE FOUNDER'S VISION</span>
+            <span>GHUGE GROUP · THE NEXT CHAPTER</span>
+          </div>
+
           <div className="vision-inner">
             <Reveal className="vision-heading">
-              <span className="leadership-kicker">
-                04 / THE VISION BEHIND GHUGE GROUP
+              <span className="vision-overline">
+                A VISION BEYOND ONE VENTURE
               </span>
 
               <h2>
@@ -345,97 +573,59 @@ export default function Leadership() {
                 <br />
                 <em>Build a legacy.</em>
               </h2>
+
+              <div className="vision-founder">
+                <span>THE VISION OF</span>
+                <strong>Vedant Ghuge</strong>
+                <small>FOUNDER · GHUGE GROUP</small>
+              </div>
             </Reveal>
 
-            <Reveal className="vision-copy">
-              <div className="vision-quote-mark">“</div>
-              <p>
-                The vision is to build GHUGE GROUP into a recognised name —
-                a group that stands for ambition, entrepreneurship and
-                continuous growth.
+            <Reveal className="vision-copy" delay={0.2}>
+              <div className="vision-quote">“</div>
+
+              <p className="vision-main">
+                Build a recognised business group that brings
+                businesses, ideas and opportunities together
+                under one identity.
               </p>
+
+              <div className="vision-rule" />
+
               <p>
-                Not limited to one industry or one idea, but built to bring
-                multiple businesses, new opportunities and future ventures
-                together under one identity.
+                The vision is not limited to one industry or one idea.
+                It is about exploring new possibilities, creating
+                meaningful ventures and building businesses that can
+                grow with purpose.
+              </p>
+
+              <p className="vision-last-line">
+                What begins with one vision can become a platform
+                for many journeys.
               </p>
 
               <div className="vision-signature">
                 <span />
-                <div>
-                  <strong>Vedant Ghuge</strong>
-                  <small>FOUNDER & ENTREPRENEUR · GHUGE GROUP</small>
-                </div>
+                BUILT WITH VISION. DRIVEN BY AMBITION.
               </div>
             </Reveal>
           </div>
+
+          <div className="vision-bottomline">
+            <span>VISION</span>
+            <span>RESPONSIBILITY</span>
+            <span>LONG-TERM THINKING</span>
+            <span>GROWTH</span>
+          </div>
         </section>
 
-        {/* PRINCIPLES */}
-        <section className="leadership-principles">
-          <Reveal className="principles-heading">
-            <span className="leadership-kicker">05 / WHAT DRIVES US</span>
-            <h2>
-              Built on ambition.
-              <br />
-              <em>Guided by purpose.</em>
-            </h2>
-          </Reveal>
-
-          <motion.div
-            className="principles-grid"
-            variants={stagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <motion.div className="principle" variants={reveal}>
-              <span>01</span>
-              <Crown size={25} />
-              <h3>Think bigger</h3>
-              <p>
-                Look beyond immediate possibilities and imagine what can be
-                built over time.
-              </p>
-            </motion.div>
-
-            <motion.div className="principle" variants={reveal}>
-              <span>02</span>
-              <Building2 size={25} />
-              <h3>Build with purpose</h3>
-              <p>
-                Create businesses with identity, direction and a meaningful
-                place in their industries.
-              </p>
-            </motion.div>
-
-            <motion.div className="principle" variants={reveal}>
-              <span>03</span>
-              <Network size={25} />
-              <h3>Grow together</h3>
-              <p>
-                Bring people, ideas and opportunities together to create
-                lasting growth.
-              </p>
-            </motion.div>
-
-            <motion.div className="principle" variants={reveal}>
-              <span>04</span>
-              <Compass size={25} />
-              <h3>Look ahead</h3>
-              <p>
-                Keep exploring new directions and building for the future.
-              </p>
-            </motion.div>
-          </motion.div>
-        </section>
-
-        {/* CLOSING */}
+        {/* FINAL ORANGE CLOSING SECTION */}
         <section className="leadership-closing">
-          <div className="closing-decoration">GH</div>
+          <div className="closing-watermark">GH</div>
+          <div className="closing-orbit" />
 
           <Reveal className="closing-content">
-            <span className="leadership-kicker">
+            <span className="closing-kicker">
               THE JOURNEY CONTINUES
             </span>
 
@@ -446,9 +636,8 @@ export default function Leadership() {
             </h2>
 
             <p>
-              The ambition is bigger than today. The vision is to keep
-              building, keep growing and create a group that means something
-              for generations to come.
+              Rooted in family. Shaped by sport. Driven by the ambition
+              to build something that continues to grow.
             </p>
 
             <a href="/businesses" className="closing-link">
@@ -468,25 +657,24 @@ export default function Leadership() {
 }
 
 const styles = `
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
 
 .leadership-page {
-  --wine: #351820;
-  --wine-deep: #241419;
-  --wine-mid: #51232D;
-  --wine-soft: #713844;
-  --cream: #F4E8DA;
-  --cream-dark: #E9D8C9;
-  --gold: #C7A47B;
-  --gold-light: #E4C49C;
-  --rose: #C99B91;
-  --ink: #291B1E;
-  --muted: #897775;
+  --orange: #E96A24;
+  --orange-dark: #C94B12;
+  --orange-mid: #F28A42;
+  --orange-light: #F8B078;
+  --cream: #FFF9F3;
+  --peach: #FCE6D5;
+  --muted: #98684E;
+  --ink: #783311;
+  --deep: #783311;
 
   background: var(--cream);
   color: var(--ink);
   font-family: 'DM Sans', sans-serif;
   overflow: hidden;
+  scroll-behavior: smooth;
 }
 
 .leadership-page * {
@@ -494,97 +682,141 @@ const styles = `
 }
 
 .leadership-page a {
-  text-decoration: none;
   color: inherit;
+  text-decoration: none;
 }
 
-.leadership-kicker {
+.leadership-page img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.leadership-page strong {
+  color: var(--orange-dark);
+  font-weight: 800;
+}
+
+.section-kicker {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 9px;
+  gap: 11px;
+  color: var(--orange-dark);
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 2.5px;
-  color: var(--wine-soft);
+  letter-spacing: 2.2px;
 }
 
 /* HERO */
 
 .leadership-hero {
-  min-height: 740px;
-  background: var(--wine);
+  min-height: 730px;
+  padding: 125px 8% 28px;
+  background:
+    radial-gradient(ellipse at 78% 45%, rgba(255,230,207,.3), transparent 40%),
+    linear-gradient(115deg, #C94B12 0%, #E96A24 48%, #F28A42 100%);
   color: var(--cream);
-  padding: 125px 8% 30px;
   position: relative;
   overflow: hidden;
+  isolation: isolate;
 }
 
-.leadership-hero-pattern {
+.hero-grain {
   position: absolute;
   inset: 0;
-  opacity: .12;
-  background-image:
-    linear-gradient(rgba(244,232,218,.15) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(244,232,218,.15) 1px, transparent 1px);
-  background-size: 85px 85px;
-  mask-image: linear-gradient(to right, transparent, black);
+  opacity: .06;
+  background-image: radial-gradient(rgba(255,255,255,.8) .7px, transparent .7px);
+  background-size: 8px 8px;
+  pointer-events: none;
+}
+
+.hero-orbit {
+  position: absolute;
+  border: 1px solid rgba(255,249,243,.2);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: leadershipOrbit 18s linear infinite;
+}
+
+.hero-orbit-one {
+  width: 650px;
+  height: 650px;
+  right: -230px;
+  top: -270px;
+}
+
+.hero-orbit-two {
+  width: 440px;
+  height: 440px;
+  right: -120px;
+  bottom: -250px;
+  animation-direction: reverse;
+}
+
+@keyframes leadershipOrbit {
+  to { transform: rotate(360deg); }
 }
 
 .leadership-hero-inner {
   max-width: 1300px;
-  min-height: 545px;
+  min-height: 520px;
   margin: auto;
   display: grid;
-  grid-template-columns: 1.1fr .9fr;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 55px;
   align-items: center;
+}
+
+.leadership-hero-copy {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .leadership-eyebrow {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: var(--gold);
+  color: #FFE5CB;
   font-size: 9px;
-  letter-spacing: 2.5px;
+  letter-spacing: 2.3px;
   font-weight: 700;
 }
 
 .leadership-eyebrow span {
   width: 27px;
   height: 1px;
-  background: var(--gold);
+  background: #FFE5CB;
 }
 
 .leadership-hero h1 {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(57px, 6.5vw, 91px);
-  line-height: 1.06;
-  letter-spacing: -3.5px;
+  font-size: clamp(58px, 6.4vw, 88px);
+  line-height: 1.02;
+  letter-spacing: -3px;
   font-weight: 400;
-  margin: 35px 0 25px;
+  margin: 32px 0 23px;
 }
 
 .leadership-hero h1 em {
-  color: var(--gold-light);
-  font-weight: 400;
+  color: #FFE5CB;
 }
 
 .leadership-hero-copy > p {
-  max-width: 480px;
+  max-width: 460px;
   font-size: 13px;
   line-height: 2;
-  color: rgba(244,232,218,.68);
+  color: rgba(255,249,243,.88);
 }
 
 .leadership-scroll {
   display: inline-flex;
   align-items: center;
-  gap: 18px;
-  margin-top: 30px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--gold);
+  gap: 17px;
+  margin-top: 27px;
+  padding-bottom: 11px;
+  border-bottom: 1px solid #FFE5CB;
+  color: #FFE5CB !important;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 1.7px;
@@ -592,160 +824,181 @@ const styles = `
 }
 
 .leadership-scroll:hover {
-  gap: 28px;
+  gap: 26px;
 }
 
-.leadership-hero-art {
-  height: 440px;
-  width: 100%;
+.leadership-scroll svg {
+  animation: leadershipArrow 1.7s ease-in-out infinite;
+}
+
+@keyframes leadershipArrow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(7px); }
+}
+
+.hero-image-stage {
+  height: 475px;
   position: relative;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
 }
 
-.hero-art-ring {
+.hero-image-frame {
+  width: 84%;
+  height: 430px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 180px 180px 5px 5px;
+  border: 1px solid rgba(255,229,203,.7);
+  z-index: 1;
+  background: var(--orange-dark);
+}
+
+.hero-image-frame img {
+  object-position: center 28%;
+  transition: transform 1s ease;
+}
+
+.hero-image-stage:hover .hero-image-frame img {
+  transform: scale(1.055);
+}
+
+.hero-image-shade {
   position: absolute;
-  border: 1px solid rgba(199,164,123,.25);
-  border-radius: 50%;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 35%, rgba(90,35,10,.75));
 }
 
-.ring-a {
-  width: 210px;
-  height: 210px;
-  border-style: dashed;
-  animation: leadershipRotate 35s linear infinite;
+.hero-image-label {
+  position: absolute;
+  bottom: 27px;
+  left: 25px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: white;
 }
 
-.ring-b {
-  width: 325px;
-  height: 325px;
-  animation: leadershipRotate 50s linear infinite reverse;
+.hero-image-label span {
+  color: #FFE5CB;
+  font-size: 8px;
+  letter-spacing: 2px;
 }
 
-.ring-c {
-  width: 425px;
-  height: 425px;
-  border-color: rgba(199,164,123,.12);
+.hero-image-label strong {
+  color: white;
+  font-family: 'Playfair Display', serif;
+  font-size: 23px;
+  font-weight: 400;
 }
 
-.hero-art-center {
-  width: 155px;
-  height: 155px;
-  border: 1px solid var(--gold);
-  border-radius: 50%;
-  background: radial-gradient(circle, #51232D, #351820 75%);
+.hero-image-outline {
+  position: absolute;
+  width: 88%;
+  height: 455px;
+  border: 1px solid rgba(255,229,203,.45);
+  border-radius: 190px 190px 5px 5px;
+  transform: rotate(4deg);
+}
+
+.hero-floating-card {
+  position: absolute;
+  right: -2%;
+  bottom: 23px;
+  z-index: 2;
+  padding: 14px 17px;
+  background: var(--cream);
+  color: var(--orange-dark);
+  box-shadow: 0 15px 40px rgba(90,35,10,.2);
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  box-shadow: 0 0 80px rgba(199,164,123,.12);
-  z-index: 1;
-}
-
-.hero-art-center span {
-  font-family: 'Playfair Display', serif;
-  color: var(--gold-light);
-  font-size: 54px;
-  letter-spacing: -5px;
-}
-
-.hero-art-center small {
+  gap: 10px;
   font-size: 8px;
-  letter-spacing: 2px;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
-.hero-art-label {
-  position: absolute;
-  background: var(--wine);
-  border: 1px solid rgba(199,164,123,.4);
-  color: var(--gold-light);
-  padding: 9px 14px;
-  font-size: 8px;
-  letter-spacing: 2px;
+.hero-floating-card svg {
+  color: var(--orange);
 }
 
-.art-label-top {
-  top: 16%;
-  right: 13%;
-}
-
-.art-label-bottom {
-  bottom: 15%;
-  left: 12%;
-}
-
-@keyframes leadershipRotate {
-  to { transform: rotate(360deg); }
-}
-
-.leadership-hero-bottom {
+.hero-bottom {
   max-width: 1300px;
-  margin: 30px auto 0;
-  padding-top: 20px;
-  border-top: 1px solid rgba(244,232,218,.18);
+  margin: 25px auto 0;
+  padding-top: 19px;
+  border-top: 1px solid rgba(255,249,243,.35);
   display: flex;
   justify-content: space-between;
-  color: rgba(244,232,218,.5);
+  color: rgba(255,249,243,.8);
   font-size: 8px;
-  letter-spacing: 2px;
+  letter-spacing: 1.8px;
 }
 
-/* INTRO */
+/* FAMILY STORY */
 
-.leadership-intro {
+.family-story {
   max-width: 1300px;
   margin: auto;
-  padding: 130px 8%;
+  padding: 110px 8%;
   display: grid;
-  grid-template-columns: 1fr .8fr;
-  gap: 100px;
+  grid-template-columns: 1fr .85fr;
+  gap: 90px;
   align-items: end;
 }
 
-.leadership-intro h2,
+.family-story h2,
 .family-tree-heading h2,
-.profiles-heading h2,
-.vision-heading h2,
-.principles-heading h2 {
+.profiles-heading h2 {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(43px, 5vw, 65px);
-  line-height: 1.13;
-  font-weight: 400;
+  font-size: clamp(45px, 5.2vw, 68px);
+  line-height: 1.1;
   letter-spacing: -2px;
-  margin: 25px 0 0;
+  font-weight: 400;
+  margin: 24px 0 0;
 }
 
-.leadership-intro h2 em,
+.family-story h2 em,
 .family-tree-heading h2 em,
-.profiles-heading h2 em,
-.vision-heading h2 em,
-.principles-heading h2 em {
-  color: var(--wine-soft);
+.profiles-heading h2 em {
+  color: var(--orange);
   font-weight: 400;
 }
 
-.leadership-intro-text p {
+.story-copy p {
+  color: var(--muted);
   font-size: 13px;
   line-height: 2;
-  color: var(--muted);
-  margin: 0 0 17px;
+  margin: 0 0 16px;
+}
+
+.story-signature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 27px;
+  color: var(--orange-dark);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
 }
 
 /* FAMILY TREE */
 
 .family-tree-section {
-  background: #EDE0D3;
-  padding: 110px 8% 95px;
+  background: var(--peach);
+  padding: 100px 8% 90px;
   text-align: center;
 }
 
 .family-tree-heading {
-  max-width: 700px;
-  margin: 0 auto;
+  max-width: 680px;
+  margin: auto;
 }
 
-.family-tree-heading .leadership-kicker {
+.family-tree-heading .section-kicker {
   justify-content: center;
 }
 
@@ -753,68 +1006,100 @@ const styles = `
   color: var(--muted);
   font-size: 13px;
   line-height: 1.8;
-  margin-top: 20px;
+  margin-top: 18px;
 }
 
 .family-tree {
-  max-width: 900px;
-  margin: 65px auto 0;
+  max-width: 850px;
+  margin: 55px auto 0;
 }
 
-.tree-root {
-  display: flex;
-  justify-content: center;
+.parents-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 35px;
+  max-width: 650px;
+  margin: auto;
   position: relative;
-  z-index: 2;
 }
 
-.tree-node {
-  width: 290px;
-  min-height: 255px;
-  background: var(--wine);
+.parents-row::after {
+  content: "";
+  position: absolute;
+  height: 1px;
+  width: 35px;
+  background: var(--orange);
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%);
+}
+
+.family-node {
+  background: linear-gradient(145deg, #E96A24, #C94B12);
   color: var(--cream);
-  padding: 23px 20px;
+  padding: 22px 16px;
+  border: 1px solid rgba(201,75,18,.4);
+  box-shadow: 0 14px 38px rgba(120,51,17,.12);
   position: relative;
-  border: 1px solid rgba(199,164,123,.55);
-  box-shadow: 0 15px 45px rgba(53,24,32,.09);
+  text-align: center;
+  transition: box-shadow .4s ease;
 }
 
-.tree-node-label {
-  display: block;
-  color: var(--gold-light);
-  font-size: 8px;
-  letter-spacing: 2px;
-}
-
-.tree-node-initial {
-  width: 75px;
-  height: 75px;
-  margin: 18px auto 12px;
-  border: 1px solid var(--gold);
+.family-node-image {
+  width: 105px;
+  height: 105px;
+  margin: 0 auto 15px;
+  border: 2px solid #F8B078;
   border-radius: 50%;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--gold-light);
-  font-family: 'Playfair Display', serif;
-  font-size: 30px;
+  background: var(--orange-dark);
 }
 
-.tree-node h3 {
+.family-node-image img {
+  object-fit: cover;
+  object-position: center 25%;
+}
+
+.family-node-image span {
   font-family: 'Playfair Display', serif;
-  font-size: 24px;
+  font-size: 32px;
+  color: #FFE5CB;
+}
+
+.family-node-role {
+  display: block;
+  color: #FFE5CB;
+  font-size: 7px;
+  letter-spacing: 1.4px;
+  line-height: 1.6;
+}
+
+.family-node h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
   font-weight: 400;
-  margin: 8px 0;
+  margin: 9px 0 13px;
+  color: white;
 }
 
-.tree-node p {
-  color: rgba(244,232,218,.65);
-  font-size: 10px;
-  margin: 0;
+.family-node-bottom {
+  display: block;
+  padding-top: 11px;
+  border-top: 1px solid rgba(255,249,243,.25);
+  color: rgba(255,249,243,.75);
+  font-size: 7px;
+  letter-spacing: 1.7px;
+}
+
+.mother-node {
+  background: linear-gradient(145deg, #F28A42, #D95A19);
 }
 
 .tree-connector {
-  height: 90px;
+  height: 82px;
   width: 50%;
   margin: auto;
   position: relative;
@@ -822,29 +1107,26 @@ const styles = `
 
 .tree-vertical-line {
   width: 1px;
-  height: 45px;
+  height: 41px;
   position: absolute;
   top: 0;
   left: 50%;
-  background: var(--gold);
-  transform-origin: top;
+  background: var(--orange);
 }
 
 .tree-horizontal-line {
   position: absolute;
-  top: 44px;
+  top: 40px;
   left: 0;
   width: 100%;
   height: 1px;
-  background: var(--gold);
-  transform-origin: left;
+  background: var(--orange);
 }
 
 .tree-children {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  position: relative;
+  gap: 55px;
 }
 
 .tree-child {
@@ -854,78 +1136,215 @@ const styles = `
 }
 
 .child-connector {
-  height: 45px;
+  height: 42px;
   width: 1px;
-  background: var(--gold);
-  margin-top: -45px;
-  margin-bottom: 0;
+  background: var(--orange);
+  margin-top: -42px;
 }
 
 .child-node {
   width: 100%;
-  max-width: 330px;
-  min-height: 280px;
-  padding: 25px 18px;
+  max-width: 325px;
 }
 
 .vedant-node {
-  background: var(--wine-deep);
-  border-color: var(--gold);
-  box-shadow: 0 18px 50px rgba(53,24,32,.16);
-}
-
-.tree-node-note {
-  display: inline-block;
-  color: var(--gold-light);
-  font-size: 8px;
-  letter-spacing: 1.4px;
-  margin-top: 17px;
+  background: linear-gradient(145deg, #C94B12, #A83D0C);
 }
 
 .tree-caption {
-  margin-top: 55px;
+  margin-top: 45px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 13px;
+  gap: 12px;
   color: var(--muted);
   font-size: 8px;
-  letter-spacing: 1.8px;
+  letter-spacing: 1.7px;
 }
 
 .tree-caption span {
   width: 25px;
   height: 1px;
-  background: var(--gold);
+  background: var(--orange);
+}
+
+/* ROLL BALL */
+
+.sports-section {
+  max-width: 1450px;
+  margin: auto;
+  padding: 115px 8%;
+}
+
+.sports-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 45px;
+  margin-bottom: 55px;
+}
+
+.sports-heading h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(44px, 5.3vw, 70px);
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: -2px;
+  margin: 23px 0 17px;
+}
+
+.sports-heading h2 em {
+  color: var(--orange);
+}
+
+.sports-heading > div:first-child p {
+  max-width: 490px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.sports-values {
+  min-width: 165px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  border-left: 1px solid var(--orange);
+  padding: 10px 0 10px 22px;
+  color: var(--orange-dark);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.7px;
+}
+
+.sports-values svg {
+  margin-bottom: 5px;
+}
+
+.sports-feature {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 70px;
+  align-items: center;
+}
+
+.sports-image {
+  height: 470px;
+  position: relative;
+  overflow: hidden;
+  background: var(--peach);
+}
+
+.sports-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 8%;
+  transition: transform 1s ease;
+}
+
+.sports-image:hover img {
+  transform: scale(1.035);
+}
+
+.sports-image-label {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  padding: 12px 15px;
+  background: var(--cream);
+  color: var(--orange-dark);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+}
+
+.sports-copy h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(39px, 4.3vw, 57px);
+  line-height: 1.12;
+  font-weight: 400;
+  margin: 23px 0;
+}
+
+.sports-copy h3 em {
+  color: var(--orange);
+}
+
+.sports-copy > p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 2;
+  margin-bottom: 16px;
+}
+
+.sports-highlight {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 27px;
+  padding-top: 19px;
+  border-top: 1px solid rgba(201,75,18,.2);
+  color: var(--orange);
+}
+
+.sports-highlight div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sports-highlight strong {
+  color: var(--orange-dark);
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.sports-highlight span {
+  color: var(--muted);
+  font-size: 10px;
 }
 
 /* PROFILES */
 
 .leadership-profiles {
-  padding: 125px 8%;
-  max-width: 1500px;
-  margin: auto;
+  background: var(--peach);
+  padding: 105px 8% 115px;
 }
 
 .profiles-heading {
-  margin-bottom: 55px;
+  max-width: 1300px;
+  margin: 0 auto 48px;
+}
+
+.profiles-heading p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+  margin-top: 17px;
 }
 
 .leaders-grid {
+  max-width: 1300px;
+  margin: auto;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 25px;
 }
 
 .leader-card {
-  background: #EDE0D3;
-  padding: 20px;
-  overflow: hidden;
-  transition: box-shadow .4s ease;
+  background: var(--cream);
+  padding: 21px;
+  border: 1px solid rgba(201,75,18,.2);
+  transition:
+    box-shadow .4s ease,
+    border-color .4s ease;
 }
 
 .leader-card:hover {
-  box-shadow: 0 20px 45px rgba(53,24,32,.1);
+  box-shadow: 0 22px 50px rgba(120,51,17,.16);
+  border-color: var(--orange);
 }
 
 .leader-card-top {
@@ -934,280 +1353,326 @@ const styles = `
   justify-content: space-between;
   color: var(--muted);
   font-size: 8px;
-  letter-spacing: 1.4px;
+  letter-spacing: 1.5px;
 }
 
-.leader-card-line {
-  width: 32px;
-  height: 1px;
-  background: var(--gold);
+.leader-card-top svg {
+  color: var(--orange);
 }
 
-.leader-portrait {
-  height: 265px;
-  margin: 20px 0;
-  background: var(--wine);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.leader-photo-wrap {
+  height: 390px;
+  margin: 18px 0 22px;
   position: relative;
   overflow: hidden;
+  background: var(--peach);
 }
 
-.leader-card.harshall .leader-portrait {
-  background: var(--wine-mid);
+.leader-photo {
+  object-fit: cover;
+  object-position: center 25%;
+  transition: transform .9s ease;
 }
 
-.leader-card.vedant .leader-portrait {
-  background: var(--wine-deep);
+.leader-card:hover .leader-photo {
+  transform: scale(1.045);
 }
 
-.portrait-orbit {
+.leader-photo-overlay {
   position: absolute;
-  width: 190px;
-  height: 190px;
-  border: 1px solid rgba(199,164,123,.25);
-  border-radius: 50%;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(120,51,17,.48), transparent 42%);
 }
 
-.portrait-orbit-one {
-  transform: scale(1);
-  transition: transform .7s ease;
-}
-
-.portrait-orbit-two {
-  width: 240px;
-  height: 240px;
-  border-style: dashed;
-  opacity: .6;
-  transition: transform .7s ease;
-}
-
-.leader-card:hover .portrait-orbit-one {
-  transform: scale(1.18);
-}
-
-.leader-card:hover .portrait-orbit-two {
-  transform: rotate(35deg) scale(1.05);
-}
-
-.portrait-initials {
-  font-family: 'Playfair Display', serif;
-  font-size: 86px;
-  color: var(--gold-light);
-  letter-spacing: -5px;
-  z-index: 1;
-}
-
-.portrait-caption {
+.leader-photo-caption {
   position: absolute;
-  bottom: 15px;
-  left: 17px;
-  color: rgba(244,232,218,.55);
+  bottom: 16px;
+  left: 18px;
+  color: white;
   font-size: 8px;
-  letter-spacing: 2px;
+  letter-spacing: 1.8px;
 }
 
 .leader-role {
   font-size: 8px;
-  color: var(--wine-soft);
+  color: var(--orange-dark);
   letter-spacing: 1.8px;
   font-weight: 700;
 }
 
 .leader-info h3 {
   font-family: 'Playfair Display', serif;
-  font-size: 27px;
+  font-size: 31px;
   font-weight: 400;
-  margin: 10px 0 5px;
+  margin: 9px 0 5px;
+  color: var(--ink);
 }
 
 .leader-title {
   font-size: 10px;
-  color: var(--gold);
+  color: var(--orange-dark);
+  font-weight: 600;
 }
 
-.leader-info p {
+.leader-info > p {
   font-size: 11px;
-  line-height: 1.9;
+  line-height: 1.95;
   color: var(--muted);
-  margin: 17px 0 5px;
+  margin: 17px 0;
 }
 
-/* VISION */
+.leader-info > p strong {
+  color: var(--orange-dark);
+  font-weight: 800;
+}
+
+.leader-qualities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(201,75,18,.2);
+}
+
+.leader-qualities span {
+  padding: 8px 10px;
+  border: 1px solid rgba(201,75,18,.25);
+  color: var(--orange-dark);
+  font-size: 8px;
+  letter-spacing: .7px;
+}
+
+/* FOUNDER VISION — FEATURE SECTION */
 
 .vision-section {
-  background: var(--wine);
-  color: var(--cream);
-  padding: 125px 8%;
   position: relative;
   overflow: hidden;
+  isolation: isolate;
+  padding: 35px 8% 75px;
+  background:
+    radial-gradient(ellipse at 92% 12%, rgba(248,176,120,.22), transparent 30%),
+    var(--cream);
+  color: var(--ink);
+}
+
+.vision-topline {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 0 20px;
+  border-bottom: 1px solid rgba(201,75,18,.22);
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  color: var(--orange-dark);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
 }
 
 .vision-watermark {
   position: absolute;
-  right: 4%;
-  top: -5%;
+  right: 2%;
+  top: 7%;
   font-family: 'Playfair Display', serif;
-  font-size: clamp(260px, 40vw, 540px);
+  font-size: clamp(250px, 38vw, 510px);
   line-height: 1;
-  color: rgba(244,232,218,.025);
+  color: rgba(233,106,36,.055);
   pointer-events: none;
+  animation: visionFloat 8s ease-in-out infinite;
+}
+
+@keyframes visionFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-16px); }
 }
 
 .vision-inner {
   max-width: 1300px;
+  min-height: 600px;
   margin: auto;
+  padding: 85px 0 65px;
   display: grid;
-  grid-template-columns: 1.1fr .9fr;
+  grid-template-columns: 1.05fr .95fr;
   gap: 100px;
+  align-items: center;
   position: relative;
   z-index: 1;
 }
 
-.vision-heading .leadership-kicker {
-  color: var(--gold);
+.vision-overline {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--orange-dark);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.vision-overline::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: var(--orange);
 }
 
 .vision-heading h2 {
-  font-size: clamp(55px, 6.5vw, 86px);
-  margin-top: 35px;
-  line-height: 1.08;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(58px, 7vw, 91px);
+  line-height: 1.02;
+  letter-spacing: -3px;
+  font-weight: 400;
+  margin: 34px 0 45px;
+  color: var(--ink);
 }
 
 .vision-heading h2 em {
-  color: var(--gold-light);
+  color: var(--orange);
+  font-weight: 400;
+}
+
+.vision-founder {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 20px 0 0 18px;
+  border-top: 1px solid rgba(201,75,18,.25);
+  border-left: 2px solid var(--orange);
+  max-width: 290px;
+}
+
+.vision-founder span,
+.vision-founder small {
+  color: var(--muted);
+  font-size: 8px;
+  letter-spacing: 1.8px;
+  font-weight: 700;
+}
+
+.vision-founder strong {
+  font-family: 'Playfair Display', serif;
+  font-size: 27px;
+  font-weight: 500;
+  color: var(--ink);
 }
 
 .vision-copy {
-  align-self: end;
-  padding-bottom: 10px;
+  align-self: center;
+  position: relative;
+  padding: 38px 0 0;
 }
 
-.vision-quote-mark {
+.vision-quote {
   font-family: 'Playfair Display', serif;
-  font-size: 100px;
-  line-height: .8;
-  color: var(--gold);
+  font-size: 112px;
+  line-height: .55;
+  color: var(--orange);
+  opacity: .85;
+  margin-bottom: 22px;
 }
 
 .vision-copy > p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 2.1;
+  margin: 0 0 22px;
+}
+
+.vision-copy > .vision-main {
   font-family: 'Playfair Display', serif;
-  font-size: 20px;
-  line-height: 1.75;
-  color: rgba(244,232,218,.83);
+  font-size: clamp(23px, 2.5vw, 31px);
+  line-height: 1.55;
+  color: var(--ink);
+  font-weight: 500;
+  margin-bottom: 25px;
+}
+
+.vision-rule {
+  width: 55px;
+  height: 2px;
+  background: var(--orange);
+  margin: 27px 0;
+}
+
+.vision-copy > .vision-last-line {
+  color: var(--orange-dark);
+  font-family: 'Playfair Display', serif;
+  font-size: 19px;
+  line-height: 1.7;
+  font-weight: 600;
+  margin-top: 26px;
 }
 
 .vision-signature {
   display: flex;
   align-items: center;
-  gap: 17px;
-  margin-top: 40px;
-}
-
-.vision-signature > span {
-  width: 40px;
-  height: 1px;
-  background: var(--gold);
-}
-
-.vision-signature strong {
-  display: block;
-  font-family: 'Playfair Display', serif;
-  font-size: 19px;
-  font-weight: 400;
-}
-
-.vision-signature small {
-  display: block;
-  margin-top: 5px;
+  gap: 13px;
+  margin-top: 35px;
+  color: var(--orange-dark);
   font-size: 8px;
-  letter-spacing: 1.5px;
-  color: var(--gold-light);
+  font-weight: 700;
+  letter-spacing: 1.7px;
 }
 
-/* PRINCIPLES */
+.vision-signature span {
+  width: 35px;
+  height: 1px;
+  background: var(--orange);
+}
 
-.leadership-principles {
-  padding: 125px 8%;
-  max-width: 1500px;
+.vision-bottomline {
+  max-width: 1300px;
   margin: auto;
-}
-
-.principles-heading {
-  margin-bottom: 65px;
-}
-
-.principles-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  border-top: 1px solid rgba(81,35,45,.2);
-  border-bottom: 1px solid rgba(81,35,45,.2);
-}
-
-.principle {
-  padding: 30px 22px;
-  border-right: 1px solid rgba(81,35,45,.16);
-  position: relative;
-}
-
-.principle:first-child {
-  padding-left: 0;
-}
-
-.principle:last-child {
-  border-right: 0;
-}
-
-.principle > span {
-  display: block;
-  font-size: 9px;
-  color: var(--gold);
-  letter-spacing: 1.5px;
-  margin-bottom: 30px;
-}
-
-.principle > svg {
-  color: var(--wine-soft);
-  stroke-width: 1.3;
-}
-
-.principle h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 21px;
-  font-weight: 400;
-  margin: 18px 0 10px;
-}
-
-.principle p {
-  font-size: 11px;
-  line-height: 1.8;
+  padding-top: 19px;
+  border-top: 1px solid rgba(201,75,18,.22);
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
   color: var(--muted);
-  margin: 0;
+  font-size: 8px;
+  letter-spacing: 1.8px;
+  font-weight: 700;
 }
 
-/* CLOSING */
+/* FINAL ORANGE CLOSING */
 
 .leadership-closing {
-  background: var(--wine-deep);
+  background:
+    radial-gradient(ellipse at 85% 15%, rgba(255,224,192,.22), transparent 36%),
+    linear-gradient(115deg, #C94B12 0%, #E96A24 55%, #F28A42 100%);
   color: var(--cream);
-  padding: 105px 8% 30px;
-  min-height: 560px;
+  padding: 90px 8% 27px;
+  min-height: 490px;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  isolation: isolate;
 }
 
-.closing-decoration {
+.closing-watermark {
   position: absolute;
   right: 5%;
-  top: -40px;
+  top: -65px;
   font-family: 'Playfair Display', serif;
-  font-size: clamp(250px, 42vw, 560px);
-  color: rgba(244,232,218,.025);
+  font-size: clamp(250px, 40vw, 530px);
+  color: rgba(255,249,243,.09);
   line-height: 1;
+  pointer-events: none;
+}
+
+.closing-orbit {
+  position: absolute;
+  width: 580px;
+  height: 580px;
+  right: -180px;
+  bottom: -360px;
+  border: 1px solid rgba(255,249,243,.25);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 45px rgba(255,249,243,.035),
+    0 0 0 90px rgba(255,249,243,.025);
   pointer-events: none;
 }
 
@@ -1219,26 +1684,39 @@ const styles = `
   z-index: 1;
 }
 
-.closing-content .leadership-kicker {
-  color: var(--gold);
+.closing-kicker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #FFE5CB;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.closing-kicker::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: #FFE5CB;
 }
 
 .closing-content h2 {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(55px, 7vw, 88px);
+  font-size: clamp(57px, 7vw, 88px);
   font-weight: 400;
-  line-height: 1.08;
-  letter-spacing: -3px;
-  margin: 30px 0 20px;
+  line-height: 1.04;
+  letter-spacing: -2.5px;
+  margin: 27px 0 18px;
 }
 
 .closing-content h2 em {
-  color: var(--gold-light);
+  color: #FFE5CB;
 }
 
 .closing-content p {
-  max-width: 480px;
-  color: rgba(244,232,218,.65);
+  max-width: 470px;
+  color: rgba(255,249,243,.9);
   font-size: 12px;
   line-height: 2;
 }
@@ -1246,157 +1724,168 @@ const styles = `
 .closing-link {
   display: inline-flex;
   align-items: center;
-  gap: 18px;
-  border-bottom: 1px solid var(--gold);
+  gap: 16px;
+  border-bottom: 1px solid #FFE5CB;
   padding: 13px 0;
-  margin-top: 20px;
-  color: var(--gold-light) !important;
+  margin-top: 17px;
+  color: #FFE5CB !important;
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 1.8px;
+  letter-spacing: 1.7px;
   transition: gap .3s ease;
 }
 
 .closing-link:hover {
-  gap: 28px;
+  gap: 25px;
 }
 
 .closing-footer {
   max-width: 1300px;
   width: 100%;
-  margin: 75px auto 0;
-  padding-top: 20px;
-  border-top: 1px solid rgba(244,232,218,.17);
+  margin: 65px auto 0;
+  padding-top: 19px;
+  border-top: 1px solid rgba(255,249,243,.35);
   display: flex;
   justify-content: space-between;
-  color: rgba(244,232,218,.45);
+  color: rgba(255,249,243,.82);
   font-size: 8px;
-  letter-spacing: 1.8px;
+  letter-spacing: 1.7px;
 }
 
-/* RESPONSIVE */
+/* TABLET */
 
 @media (max-width: 900px) {
   .leadership-hero-inner {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr .9fr;
+    gap: 25px;
   }
 
-  .leadership-hero-art {
+  .leadership-hero h1 {
+    font-size: 64px;
+  }
+
+  .hero-image-stage {
+    height: 410px;
+  }
+
+  .hero-image-frame {
     height: 370px;
+    width: 88%;
   }
 
-  .leadership-intro,
+  .hero-image-outline {
+    height: 390px;
+  }
+
+  .family-story {
+    gap: 45px;
+  }
+
+  .sports-feature {
+    gap: 40px;
+  }
+
   .vision-inner {
-    gap: 50px;
+    gap: 55px;
   }
 
-  .leaders-grid {
-    grid-template-columns: 1fr 1fr;
+  .vision-heading h2 {
+    font-size: 65px;
   }
 
-  .leader-card:last-child {
-    grid-column: span 2;
-  }
-
-  .principles-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .principle:nth-child(2) {
-    border-right: 0;
-  }
-
-  .principle:nth-child(1),
-  .principle:nth-child(2) {
-    border-bottom: 1px solid rgba(81,35,45,.16);
+  .leader-photo-wrap {
+    height: 330px;
   }
 }
+
+/* MOBILE */
 
 @media (max-width: 650px) {
   .leadership-hero {
     padding: 105px 7% 25px;
   }
 
+  .leadership-hero-inner {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
   .leadership-hero h1 {
-    font-size: 56px;
-    letter-spacing: -2.5px;
+    font-size: 55px;
+    letter-spacing: -2px;
   }
 
-  .leadership-hero-art {
-    height: 320px;
+  .hero-image-stage {
+    height: 350px;
   }
 
-  .ring-a {
-    width: 165px;
-    height: 165px;
+  .hero-image-frame {
+    width: 82%;
+    height: 315px;
   }
 
-  .ring-b {
-    width: 245px;
-    height: 245px;
+  .hero-image-outline {
+    width: 87%;
+    height: 330px;
   }
 
-  .ring-c {
-    width: 320px;
-    height: 320px;
+  .hero-floating-card {
+    right: -1%;
+    bottom: 5px;
+    padding: 10px 12px;
+    font-size: 7px;
   }
 
-  .hero-art-center {
-    width: 125px;
-    height: 125px;
-  }
-
-  .hero-art-center span {
-    font-size: 44px;
-  }
-
-  .leadership-hero-bottom {
+  .hero-bottom {
     flex-wrap: wrap;
     gap: 12px;
     font-size: 7px;
   }
 
-  .leadership-intro {
-    padding: 85px 7%;
+  .family-story {
+    padding: 80px 7%;
     grid-template-columns: 1fr;
     gap: 25px;
   }
 
-  .leadership-intro h2,
+  .family-story h2,
   .family-tree-heading h2,
-  .profiles-heading h2,
-  .principles-heading h2 {
-    font-size: 46px;
+  .profiles-heading h2 {
+    font-size: 45px;
   }
 
   .family-tree-section {
-    padding: 85px 6%;
+    padding: 80px 6%;
   }
 
-  .tree-node {
-    width: 250px;
+  .parents-row {
+    gap: 13px;
+  }
+
+  .parents-row::after {
+    width: 14px;
+  }
+
+  .family-node {
+    padding: 17px 9px;
+  }
+
+  .family-node-image {
+    width: 78px;
+    height: 78px;
+  }
+
+  .family-node-role {
+    font-size: 6px;
+    letter-spacing: .8px;
+  }
+
+  .family-node h3 {
+    font-size: 15px;
   }
 
   .tree-children {
-    gap: 15px;
-  }
-
-  .child-node {
-    width: 100%;
-    padding: 20px 9px;
-  }
-
-  .child-node h3 {
-    font-size: 18px;
-  }
-
-  .child-node p {
-    font-size: 9px;
-  }
-
-  .tree-node-note {
-    font-size: 6px;
-    letter-spacing: 1px;
+    gap: 14px;
   }
 
   .tree-connector {
@@ -1404,81 +1893,163 @@ const styles = `
   }
 
   .tree-caption {
-    font-size: 7px;
+    font-size: 6px;
     line-height: 1.8;
   }
 
+  .sports-section {
+    padding: 80px 7%;
+  }
+
+  .sports-heading {
+    display: block;
+    margin-bottom: 35px;
+  }
+
+  .sports-heading h2 {
+    font-size: 44px;
+  }
+
+  .sports-values {
+    margin-top: 25px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    border-left: 0;
+    border-top: 1px solid var(--orange);
+    padding: 15px 0 0;
+    gap: 12px;
+  }
+
+  .sports-values svg {
+    margin: 0;
+  }
+
+  .sports-feature {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .sports-image {
+    height: 360px;
+  }
+
+  .sports-image img {
+    object-position: center 5%;
+  }
+
+  .sports-copy h3 {
+    font-size: 43px;
+  }
+
   .leadership-profiles {
-    padding: 85px 7%;
+    padding: 80px 7%;
   }
 
   .leaders-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 
-  .leader-card:last-child {
-    grid-column: auto;
-  }
-
-  .leader-portrait {
-    height: 280px;
+  .leader-photo-wrap {
+    height: 350px;
   }
 
   .vision-section {
-    padding: 90px 7%;
+    padding: 28px 7% 45px;
+  }
+
+  .vision-topline {
+    font-size: 7px;
+    letter-spacing: 1px;
+    align-items: flex-start;
+  }
+
+  .vision-topline span:last-child {
+    text-align: right;
   }
 
   .vision-inner {
+    min-height: 0;
     grid-template-columns: 1fr;
-    gap: 45px;
+    gap: 35px;
+    padding: 65px 0 50px;
   }
 
   .vision-heading h2 {
-    font-size: 57px;
+    font-size: clamp(52px, 13vw, 67px);
+    letter-spacing: -2px;
+    margin: 26px 0 32px;
   }
 
-  .vision-copy > p {
-    font-size: 18px;
+  .vision-founder strong {
+    font-size: 24px;
   }
 
-  .leadership-principles {
-    padding: 90px 7%;
+  .vision-copy {
+    padding-top: 10px;
   }
 
-  .principles-grid {
-    grid-template-columns: 1fr 1fr;
+  .vision-quote {
+    font-size: 85px;
   }
 
-  .principle {
-    padding: 25px 12px;
+  .vision-copy > .vision-main {
+    font-size: 23px;
   }
 
-  .principle:first-child {
-    padding-left: 0;
-  }
-
-  .principle h3 {
-    font-size: 18px;
-  }
-
-  .principle p {
-    font-size: 10px;
+  .vision-bottomline {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 12px 22px;
+    font-size: 7px;
   }
 
   .leadership-closing {
-    padding: 85px 7% 25px;
-    min-height: 520px;
+    padding: 75px 7% 25px;
+    min-height: 440px;
   }
 
   .closing-content h2 {
-    font-size: 56px;
+    font-size: 54px;
+    letter-spacing: -1.5px;
   }
 
   .closing-footer {
     flex-direction: column;
-    gap: 13px;
+    gap: 12px;
+    margin-top: 50px;
   }
 }
+
+@media (max-width: 380px) {
+  .leadership-hero h1 {
+    font-size: 47px;
+  }
+
+  .family-node h3 {
+    font-size: 13px;
+  }
+
+  .family-node-role {
+    font-size: 5px;
+  }
+
+  .family-node-image {
+    width: 67px;
+    height: 67px;
+  }
+
+  .vision-heading h2 {
+    font-size: 49px;
+  }
+
+  .closing-content h2 {
+    font-size: 47px;
+  }
+}
+
+/* ACCESSIBILITY */
 
 @media (prefers-reduced-motion: reduce) {
   .leadership-page *,
@@ -1487,6 +2058,7 @@ const styles = `
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 `;
